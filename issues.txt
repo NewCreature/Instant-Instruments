@@ -1,0 +1,10 @@
+Instant Instruments Issue
+-------------------------
+
+[ ]Implement piano keys.
+
+[ ]Implement changing guitar program.
+
+[ ]Implement changing guitar octaves.
+
+[ ]Add graphical UI.
