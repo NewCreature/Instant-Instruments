@@ -3,6 +3,8 @@ Instant Instruments Issue
 
 [X]Implement piano keys.
 
+[ ]Add drum keys.
+
 [ ]Implement changing guitar program.
 
 [ ]Implement changing guitar octaves.
