@@ -10,3 +10,5 @@ Instant Instruments Issue
 [ ]Implement changing guitar octaves.
 
 [ ]Add graphical UI.
+
+[ ]See if we can start/stop FluidSynth automatically on Linux.
