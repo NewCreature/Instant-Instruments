@@ -1,7 +1,7 @@
 Instant Instruments Issue
 -------------------------
 
-[ ]Implement piano keys.
+[X]Implement piano keys.
 
 [ ]Implement changing guitar program.
 
