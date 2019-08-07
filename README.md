@@ -4,7 +4,7 @@ Instant Instruments allows you to interface with your PC's built-in software
 synthesizer using something you already have connected to your PC, your
 keyboard. You can use either a guitar- or piano-style interface.
 
-## Instant Piano (Not Implemented Yet)
+## Instant Piano
 
 The piano layout is as follows:
 
