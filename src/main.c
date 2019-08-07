@@ -4,6 +4,7 @@
 #include "MIDIA5/midia5.h"
 
 #include "guitar.h"
+#include "piano.h"
 
 /* structure to hold all of our app-specific data */
 typedef struct
@@ -11,6 +12,7 @@ typedef struct
 
 	MIDIA5_OUTPUT_HANDLE * midi_out;
 	II_GUITAR * guitar;
+	II_PIANO * piano[2];
 
 	int key_row_1_octave;
 	int key_row_2_octave;
@@ -31,6 +33,8 @@ void app_logic(void * data)
 			 * to deal with various parts of your app (logo, title screen, in-
 			 * game, etc.) */
 			ii_guitar_logic(app->guitar);
+			ii_piano_logic(app->piano[0]);
+			ii_piano_logic(app->piano[1]);
 			break;
 		}
 	}
@@ -76,6 +80,20 @@ bool app_initialize(APP_INSTANCE * app, int argc, char * argv[])
 		return false;
 	}
 
+	/* set up piano controllers */
+	app->piano[0] = ii_create_piano(app->midi_out, 0);
+	if(!app->piano[0])
+	{
+		printf("Failed to create piano!\n");
+		return false;
+	}
+	app->piano[1] = ii_create_piano(app->midi_out, 1);
+	if(!app->piano[1])
+	{
+		printf("Failed to create piano!\n");
+		return false;
+	}
+
 	app->state = 0;
 	return true;
 }
@@ -99,6 +117,14 @@ int main(int argc, char * argv[])
 	if(app.guitar)
 	{
 		ii_destroy_guitar(app.guitar);
+	}
+	if(app.piano[0])
+	{
+		ii_destroy_piano(app.piano[0]);
+	}
+	if(app.piano[1])
+	{
+		ii_destroy_piano(app.piano[1]);
 	}
 	t3f_finish();
 	return 0;
