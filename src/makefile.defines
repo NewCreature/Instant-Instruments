@@ -39,7 +39,7 @@ MACOSX_PLATFORM_LIBS = -framework AVFoundation -framework AudioUnit
 ###############
 #LINUX_CFLAGS =
 LINUX_PLATFORM_OBJECTS = MIDIA5/unix/alsa.o
-#LINUX_PLATFORM_LIBS =
+LINUX_PLATFORM_LIBS = -lasound
 #LINUX_DEPEND_LIBS =
 #LINUX_PLATFORM_TARGET =
 
