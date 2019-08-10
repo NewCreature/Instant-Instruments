@@ -55,9 +55,46 @@ void app_render(void * data)
 	}
 }
 
+static int get_midi_device(void)
+{
+	const char * val;
+	int val_i;
+	int device_count;
+	int i;
+
+	device_count = midia5_get_output_device_count();
+	val = al_get_config_value(t3f_config, "Settings", "midi_device");
+	if(val)
+	{
+		val_i = atoi(val);
+		if(val_i < device_count)
+		{
+			return val_i;
+		}
+	}
+	else
+	{
+		/* look for FLUID Synth */
+		for(i = 0; i < device_count; i++)
+		{
+			if(!memcmp(midia5_get_output_device_name(i), "FLUID", 5))
+			{
+				return i;
+			}
+		}
+	}
+	if(device_count < 0)
+	{
+		return -1;
+	}
+	return 0;
+}
+
 /* initialize our app, load graphics, etc. */
 bool app_initialize(APP_INSTANCE * app, int argc, char * argv[])
 {
+	int midi_device;
+
 	/* initialize T3F */
 	if(!t3f_initialize(T3F_APP_TITLE, 640, 480, 60.0, app_logic, app_render, T3F_DEFAULT, app))
 	{
@@ -65,6 +102,12 @@ bool app_initialize(APP_INSTANCE * app, int argc, char * argv[])
 		return false;
 	}
 	memset(app, 0, sizeof(APP_INSTANCE));
+	midi_device = get_midi_device();
+	if(midi_device < 0)
+	{
+		printf("Could not detect MIDI device!\n");
+		return false;
+	}
 	app->midi_out = midia5_create_output_handle(0);
 	if(!app->midi_out)
 	{
