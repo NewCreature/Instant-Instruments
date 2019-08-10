@@ -47,11 +47,17 @@ debian_package: $(APP_EXE_NAME) ../debian/control_gen
 	cp ../debian/app.desktop ../temp/debian_temp/usr/share/applications/$(DEBIAN_APP_NAME).desktop
 	cp ../debian/menu ../temp/debian_temp/usr/share/menu/$(DEBIAN_APP_NAME)
 	cp ../bin/$(DEBIAN_APP_NAME) ../temp/debian_temp/usr/$(DEBIAN_DIR)/$(DEBIAN_APP_NAME)
+ifdef DEBIAN_HELPER_SCRIPT
+	cp ../bin/$(DEBIAN_HELPER_SCRIPT) ../temp/debian_temp/usr/$(DEBIAN_DIR)/$(DEBIAN_HELPER_SCRIPT)
+endif
 	cp ../debian/control ../temp/DEBIAN
 	cp ../debian/postinst ../temp/DEBIAN
 	echo Building package...
 	strip ../temp/debian_temp/usr/$(DEBIAN_DIR)/$(DEBIAN_APP_NAME)
 	chmod 755 ../temp/debian_temp/usr/$(DEBIAN_DIR)/$(DEBIAN_APP_NAME)
+ifdef DEBIAN_HELPER_SCRIPT
+	chmod 755 ../temp/debian_temp/usr/$(DEBIAN_DIR)/$(DEBIAN_HELPER_SCRIPT)
+endif
 	chmod 755 ../temp/DEBIAN/postinst
 	find ../temp/debian_temp -type d | xargs chmod 755
 	find ../temp/debian_temp/usr/share/$(DEBIAN_APP_NAME) -type f -exec chmod 644 {} \;
