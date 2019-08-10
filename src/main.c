@@ -77,6 +77,7 @@ static int get_midi_device(void)
 		/* look for FLUID Synth */
 		for(i = 0; i < device_count; i++)
 		{
+			printf("device %d: %s\n", i, midia5_get_output_device_name(i));
 			if(!memcmp(midia5_get_output_device_name(i), "FLUID", 5))
 			{
 				return i;
@@ -90,6 +91,49 @@ static int get_midi_device(void)
 	return 0;
 }
 
+#ifdef ALLEGRO_UNIX
+	#ifndef ALLEGRO_MACOSX
+		static char * get_helper_script_path(char * buf, int buf_size)
+		{
+			ALLEGRO_PATH * path;
+
+			path = al_get_standard_path(ALLEGRO_EXENAME_PATH);
+			if(path)
+			{
+				al_set_path_filename(path, "instant_instruments_helper.sh");
+				strcpy(buf, al_path_cstr(path, '/'));
+				al_destroy_path(path);
+				return buf;
+			}
+			return NULL;
+		}
+
+		static int start_fluidsynth(void)
+		{
+			char command[1024];
+
+			if(get_helper_script_path(command, 1024))
+			{
+				strcat(command, " start");
+				return system(command);
+			}
+			return 0;
+		}
+
+		static int stop_fluidsynth(void)
+		{
+			char command[1024];
+
+			if(get_helper_script_path(command, 1024))
+			{
+				strcat(command, " stop");
+				return system(command);
+			}
+			return 0;
+		}
+	#endif
+#endif
+
 /* initialize our app, load graphics, etc. */
 bool app_initialize(APP_INSTANCE * app, int argc, char * argv[])
 {
@@ -102,13 +146,20 @@ bool app_initialize(APP_INSTANCE * app, int argc, char * argv[])
 		return false;
 	}
 	memset(app, 0, sizeof(APP_INSTANCE));
+
+	#ifdef ALLEGRO_UNIX
+		#ifndef ALLEGRO_MACOSX
+			start_fluidsynth();
+		#endif
+	#endif
 	midi_device = get_midi_device();
 	if(midi_device < 0)
 	{
 		printf("Could not detect MIDI device!\n");
 		return false;
 	}
-	app->midi_out = midia5_create_output_handle(0);
+	printf("midi device = %d\n", midi_device);
+	app->midi_out = midia5_create_output_handle(midi_device);
 	if(!app->midi_out)
 	{
 		printf("Could not get MIDI output device!\n");
@@ -157,6 +208,11 @@ int main(int argc, char * argv[])
 	{
 		midia5_destroy_output_handle(app.midi_out);
 	}
+	#ifdef ALLEGRO_UNIX
+		#ifndef ALLEGRO_MACOSX
+			stop_fluidsynth();
+		#endif
+	#endif
 	if(app.guitar)
 	{
 		ii_destroy_guitar(app.guitar);
