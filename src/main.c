@@ -5,6 +5,7 @@
 
 #include "guitar.h"
 #include "piano.h"
+#include "drums.h"
 
 /* structure to hold all of our app-specific data */
 typedef struct
@@ -13,6 +14,7 @@ typedef struct
 	MIDIA5_OUTPUT_HANDLE * midi_out;
 	II_GUITAR * guitar;
 	II_PIANO * piano[2];
+	II_DRUMS * drums;
 
 	int key_row_1_octave;
 	int key_row_2_octave;
@@ -35,6 +37,7 @@ void app_logic(void * data)
 			ii_guitar_logic(app->guitar);
 			ii_piano_logic(app->piano[0]);
 			ii_piano_logic(app->piano[1]);
+			ii_drums_logic(app->drums);
 			break;
 		}
 	}
@@ -188,6 +191,14 @@ bool app_initialize(APP_INSTANCE * app, int argc, char * argv[])
 		return false;
 	}
 
+	/* set up drums controllers */
+	app->drums = ii_create_drums(app->midi_out);
+	if(!app->drums)
+	{
+		printf("Failed to create drums!\n");
+		return false;
+	}
+
 	app->state = 0;
 	return true;
 }
@@ -224,6 +235,10 @@ int main(int argc, char * argv[])
 	if(app.piano[1])
 	{
 		ii_destroy_piano(app.piano[1]);
+	}
+	if(app.drums)
+	{
+		ii_destroy_drums(app.drums);
 	}
 	t3f_finish();
 	return 0;
