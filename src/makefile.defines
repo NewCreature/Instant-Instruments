@@ -92,7 +92,7 @@ ANDROID_PLATFORM_LIBS = -lcurl
 # Debian packaging stuff #
 ##########################
 DEBIAN_APP_NAME = $(subst _,-,$(APP_NAME))
-DEBIAN_HELPER_SCRIPT = instant_instruments_helper.sh
+DEBIAN_HELPER_SCRIPT = instant-instruments-helper.sh
 DEBIAN_SECTION = games
 DEBIAN_MENU_SECTION = Games
 DEBIAN_DESKTOP_CATEGORIES = Game

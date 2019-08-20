@@ -103,7 +103,7 @@ static int get_midi_device(void)
 			path = al_get_standard_path(ALLEGRO_EXENAME_PATH);
 			if(path)
 			{
-				al_set_path_filename(path, "instant_instruments_helper.sh");
+				al_set_path_filename(path, "instant-instruments-helper.sh");
 				strcpy(buf, al_path_cstr(path, '/'));
 				al_destroy_path(path);
 				return buf;
