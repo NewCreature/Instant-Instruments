@@ -11,7 +11,7 @@ case $1 in
     fluidsynth --server --no-shell --audio-driver=pulseaudio --midi-driver=alsa_seq \
         --reverb=0 --chorus=0 --gain=0.8 \
         /usr/share/sounds/sf2/FluidR3_GM.sf2 \
-        &>/tmp/fluidsynth.out &
+        &>/dev/null &
 
     sleep 1
 
