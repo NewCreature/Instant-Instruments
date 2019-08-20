@@ -12,6 +12,8 @@ typedef struct
 
 	MIDIA5_OUTPUT_HANDLE * midi_out;
 	T3F_CONTROLLER * controller;
+	int program;
+	int function_key;
 
 	int octave;
 	int chord_octave;
@@ -20,7 +22,7 @@ typedef struct
 
 } II_GUITAR;
 
-II_GUITAR * ii_create_guitar(MIDIA5_OUTPUT_HANDLE * hp);
+II_GUITAR * ii_create_guitar(MIDIA5_OUTPUT_HANDLE * hp, int function_key);
 void ii_destroy_guitar(II_GUITAR * gp);
 
 void ii_guitar_logic(II_GUITAR * gp);

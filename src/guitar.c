@@ -59,7 +59,7 @@ static void ii_play_guitar_power_chord(II_GUITAR * gp, int note_pos)
 	gp->key_note[note_pos].notes = 2;
 }
 
-II_GUITAR * ii_create_guitar(MIDIA5_OUTPUT_HANDLE * hp)
+II_GUITAR * ii_create_guitar(MIDIA5_OUTPUT_HANDLE * hp, int function_key)
 {
 	II_GUITAR * gp = NULL;
 	int i;
@@ -88,9 +88,11 @@ II_GUITAR * ii_create_guitar(MIDIA5_OUTPUT_HANDLE * hp)
 		ii_set_controller_key(gp->controller, 12, ALLEGRO_KEY_RSHIFT);
 	#endif
 	t3f_clear_controller_state(gp->controller);
+	gp->function_key = function_key;
 
 	/* set current MIDI program for guitar channel */
-	ii_send_program_change(gp->midi_out, 0, 30);
+	gp->program = 30;
+	ii_send_program_change(gp->midi_out, 0, gp->program);
 
 	/* default settings */
 	gp->octave = 6;
@@ -131,6 +133,30 @@ void ii_guitar_logic(II_GUITAR * gp)
 	}
 	t3f_read_controller(gp->controller);
 	t3f_update_controller(gp->controller);
+
+	if(t3f_key[gp->function_key])
+	{
+		if(t3f_key[ALLEGRO_KEY_DOWN])
+		{
+			gp->program--;
+			if(gp->program < 0)
+			{
+				gp->program = 127;
+			}
+			ii_send_program_change(gp->midi_out, 0, gp->program);
+			t3f_key[ALLEGRO_KEY_DOWN] = 0;
+		}
+		if(t3f_key[ALLEGRO_KEY_UP])
+		{
+			gp->program++;
+			if(gp->program > 127)
+			{
+				gp->program = 0;
+			}
+			ii_send_program_change(gp->midi_out, 0, gp->program);
+			t3f_key[ALLEGRO_KEY_UP] = 0;
+		}
+	}
 
 	/* detect chords */
 	c = 0;

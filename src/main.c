@@ -170,7 +170,7 @@ bool app_initialize(APP_INSTANCE * app, int argc, char * argv[])
 	}
 
 	/* set up guitar controller */
-	app->guitar = ii_create_guitar(app->midi_out);
+	app->guitar = ii_create_guitar(app->midi_out, ALLEGRO_KEY_ESCAPE);
 	if(!app->guitar)
 	{
 		printf("Failed to create guitar!\n");
@@ -178,13 +178,13 @@ bool app_initialize(APP_INSTANCE * app, int argc, char * argv[])
 	}
 
 	/* set up piano controllers */
-	app->piano[0] = ii_create_piano(app->midi_out, 0);
+	app->piano[0] = ii_create_piano(app->midi_out, 0, ALLEGRO_KEY_A);
 	if(!app->piano[0])
 	{
 		printf("Failed to create piano!\n");
 		return false;
 	}
-	app->piano[1] = ii_create_piano(app->midi_out, 1);
+	app->piano[1] = ii_create_piano(app->midi_out, 1, ALLEGRO_KEY_1);
 	if(!app->piano[1])
 	{
 		printf("Failed to create piano!\n");
@@ -192,7 +192,7 @@ bool app_initialize(APP_INSTANCE * app, int argc, char * argv[])
 	}
 
 	/* set up drums controllers */
-	app->drums = ii_create_drums(app->midi_out);
+	app->drums = ii_create_drums(app->midi_out, ALLEGRO_KEY_SPACE);
 	if(!app->drums)
 	{
 		printf("Failed to create drums!\n");

@@ -45,7 +45,7 @@ static void ii_play_drum_note(II_DRUMS * dp, int note_pos)
 	dp->key_note[note_pos].notes = 1;
 }
 
-II_DRUMS * ii_create_drums(MIDIA5_OUTPUT_HANDLE * hp)
+II_DRUMS * ii_create_drums(MIDIA5_OUTPUT_HANDLE * hp, int function_key)
 {
 	II_DRUMS * dp = NULL;
 	int i;
@@ -69,9 +69,11 @@ II_DRUMS * ii_create_drums(MIDIA5_OUTPUT_HANDLE * hp)
 		ii_set_controller_key(dp->controller, i, ii_drums_key[i]);
 	}
 	t3f_clear_controller_state(dp->controller);
+	dp->function_key = function_key;
 
 	/* set current MIDI program for guitar channel */
-	ii_send_program_change(dp->midi_out, 9, 0);
+	dp->program = 0;
+	ii_send_program_change(dp->midi_out, 9, dp->program);
 
 	return dp;
 
@@ -101,6 +103,29 @@ void ii_drums_logic(II_DRUMS * dp)
 	t3f_read_controller(dp->controller);
 	t3f_update_controller(dp->controller);
 
+	if(t3f_key[dp->function_key])
+	{
+		if(t3f_key[ALLEGRO_KEY_DOWN])
+		{
+			dp->program--;
+			if(dp->program < 0)
+			{
+				dp->program = 127;
+			}
+			ii_send_program_change(dp->midi_out, 9, dp->program);
+			t3f_key[ALLEGRO_KEY_DOWN] = 0;
+		}
+		if(t3f_key[ALLEGRO_KEY_UP])
+		{
+			dp->program++;
+			if(dp->program > 127)
+			{
+				dp->program = 0;
+			}
+			ii_send_program_change(dp->midi_out, 9, dp->program);
+			t3f_key[ALLEGRO_KEY_UP] = 0;
+		}
+	}
 	for(i = 0; i < II_DRUMS_CONTROLLER_INPUTS; i++)
 	{
 		if(dp->controller->state[i].pressed)

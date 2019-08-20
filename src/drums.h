@@ -14,12 +14,14 @@ typedef struct
 
 	MIDIA5_OUTPUT_HANDLE * midi_out;
 	T3F_CONTROLLER * controller;
+	int program;
+	int function_key;
 
 	II_KEY_NOTE key_note[6];
 
 } II_DRUMS;
 
-II_DRUMS * ii_create_drums(MIDIA5_OUTPUT_HANDLE * hp);
+II_DRUMS * ii_create_drums(MIDIA5_OUTPUT_HANDLE * hp, int function_key);
 void ii_destroy_drums(II_DRUMS * dp);
 
 void ii_drums_logic(II_DRUMS * dp);

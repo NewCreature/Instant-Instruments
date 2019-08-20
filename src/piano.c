@@ -59,7 +59,7 @@ static void ii_play_piano_chord(II_PIANO * pp, int note_pos)
 }
 
 
-II_PIANO * ii_create_piano(MIDIA5_OUTPUT_HANDLE * hp, int row)
+II_PIANO * ii_create_piano(MIDIA5_OUTPUT_HANDLE * hp, int row, int function_key)
 {
 	II_PIANO * pp = NULL;
 	int i;
@@ -83,9 +83,11 @@ II_PIANO * ii_create_piano(MIDIA5_OUTPUT_HANDLE * hp, int row)
 		ii_set_controller_key(pp->controller, i, ii_piano_key[row][i]);
 	}
 	t3f_clear_controller_state(pp->controller);
+	pp->function_key = function_key;
 
-	/* set current MIDI program for guitar channel */
-	ii_send_program_change(pp->midi_out, 1, 0);
+	/* set current MIDI program for piano channel */
+	pp->program = 0;
+	ii_send_program_change(pp->midi_out, 1, pp->program);
 
 	/* default settings */
 	pp->octave = 3 + row * 3;
@@ -118,6 +120,29 @@ void ii_piano_logic(II_PIANO * pp)
 	t3f_read_controller(pp->controller);
 	t3f_update_controller(pp->controller);
 
+	if(t3f_key[pp->function_key])
+	{
+		if(t3f_key[ALLEGRO_KEY_DOWN])
+		{
+			pp->program--;
+			if(pp->program < 0)
+			{
+				pp->program = 127;
+			}
+			ii_send_program_change(pp->midi_out, 1, pp->program);
+			t3f_key[ALLEGRO_KEY_DOWN] = 0;
+		}
+		if(t3f_key[ALLEGRO_KEY_UP])
+		{
+			pp->program++;
+			if(pp->program > 127)
+			{
+				pp->program = 0;
+			}
+			ii_send_program_change(pp->midi_out, 1, pp->program);
+			t3f_key[ALLEGRO_KEY_UP] = 0;
+		}
+	}
 	for(i = 0; i < II_PIANO_CONTROLLER_INPUTS; i++)
 	{
 		if(pp->controller->state[i].pressed)

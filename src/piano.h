@@ -14,13 +14,15 @@ typedef struct
 
 	MIDIA5_OUTPUT_HANDLE * midi_out;
 	T3F_CONTROLLER * controller;
+	int program;
+	int function_key;
 
 	int octave;
 	II_KEY_NOTE key_note[24];
 
 } II_PIANO;
 
-II_PIANO * ii_create_piano(MIDIA5_OUTPUT_HANDLE * hp, int row);
+II_PIANO * ii_create_piano(MIDIA5_OUTPUT_HANDLE * hp, int row, int function_key);
 void ii_destroy_piano(II_PIANO * pp);
 
 void ii_piano_logic(II_PIANO * pp);
