@@ -1,14 +1,21 @@
-Instant Instruments Issue
--------------------------
+Instant Instruments Issues
+--------------------------
 
-[X]Implement piano keys.
+[ ]Consolidate core instrument code. A lot of the functionality is shared
+   amongst all of the instrument types.
 
-[ ]Add drum keys.
+   [ ]Instruments should be assigned a channel at creation time.
 
-[ ]Implement changing guitar program.
+[ ]Implement shifting the base note for each instrument by a relnote or octave.
 
-[ ]Implement changing guitar octaves.
+[ ]Improve auto start of FluidSynth. We need to see if it is already running
+   before attempting to start it ourselves. If it is already running, we should
+   not kill it when we exit.
+
+   Sometimes the FluidSynth device is not listed after starting the server. We
+   should probably retry looking for it and possibly retry starting it if it's
+   not found the first time.
+
+[ ]Disable instrument controls when the instrument function key is held.
 
 [ ]Add graphical UI.
-
-[ ]See if we can start/stop FluidSynth automatically on Linux.
