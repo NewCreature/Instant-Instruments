@@ -15,6 +15,7 @@ typedef struct
 	II_GUITAR * guitar;
 	II_PIANO * piano[2];
 	II_DRUMS * drums;
+	bool kill_fluidsynth;
 
 	int key_row_1_octave;
 	int key_row_2_octave;
@@ -58,6 +59,22 @@ void app_render(void * data)
 	}
 }
 
+static int get_fluidsynth_device(void)
+{
+	int device_count;
+	int i;
+
+	device_count = midia5_get_output_device_count();
+	for(i = 0; i < device_count; i++)
+	{
+		if(!memcmp(midia5_get_output_device_name(i), "FLUID", 5))
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
 static int get_midi_device(void)
 {
 	const char * val;
@@ -80,7 +97,6 @@ static int get_midi_device(void)
 		/* look for FLUID Synth */
 		for(i = 0; i < device_count; i++)
 		{
-			printf("device %d: %s\n", i, midia5_get_output_device_name(i));
 			if(!memcmp(midia5_get_output_device_name(i), "FLUID", 5))
 			{
 				return i;
@@ -141,6 +157,7 @@ static int get_midi_device(void)
 bool app_initialize(APP_INSTANCE * app, int argc, char * argv[])
 {
 	int midi_device;
+	int try = 0;
 
 	/* initialize T3F */
 	if(!t3f_initialize(T3F_APP_TITLE, 640, 480, 60.0, app_logic, app_render, T3F_DEFAULT, app))
@@ -152,7 +169,27 @@ bool app_initialize(APP_INSTANCE * app, int argc, char * argv[])
 
 	#ifdef ALLEGRO_UNIX
 		#ifndef ALLEGRO_MACOSX
-			start_fluidsynth();
+			if(get_fluidsynth_device() < 0)
+			{
+				start_fluidsynth();
+				al_rest(1.0);
+				while(get_fluidsynth_device() < 0 && try < 5)
+				{
+					printf("FluidSynth device not found. Retrying...\n");
+					stop_fluidsynth();
+					start_fluidsynth();
+					al_rest(1.0);
+					try++;
+				}
+				if(try < 5)
+				{
+					app->kill_fluidsynth = true;
+				}
+			}
+			else
+			{
+				app->kill_fluidsynth = false;
+			}
 		#endif
 	#endif
 	midi_device = get_midi_device();
@@ -161,7 +198,6 @@ bool app_initialize(APP_INSTANCE * app, int argc, char * argv[])
 		printf("Could not detect MIDI device!\n");
 		return false;
 	}
-	printf("midi device = %d\n", midi_device);
 	app->midi_out = midia5_create_output_handle(midi_device);
 	if(!app->midi_out)
 	{
@@ -221,7 +257,10 @@ int main(int argc, char * argv[])
 	}
 	#ifdef ALLEGRO_UNIX
 		#ifndef ALLEGRO_MACOSX
-			stop_fluidsynth();
+			if(app.kill_fluidsynth)
+			{
+				stop_fluidsynth();
+			}
 		#endif
 	#endif
 	if(app.guitar)
