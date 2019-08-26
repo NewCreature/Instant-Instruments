@@ -38,12 +38,12 @@ static void ii_play_guitar_chord(II_GUITAR * gp, int note_pos)
 	int note = gp->chord_octave * 12 + ii_note_chart[gp->note_chart][note_pos];
 
 	ii_kill_guitar_note(gp, note_pos);
-	ii_send_note_on(gp->midi_out, 0, note - 4, 100);
 	ii_send_note_on(gp->midi_out, 0, note, 100);
 	ii_send_note_on(gp->midi_out, 0, note + 4, 100);
-	gp->key_note[note_pos].note[0] = note - 4;
-	gp->key_note[note_pos].note[1] = note;
-	gp->key_note[note_pos].note[2] = note + 4;
+	ii_send_note_on(gp->midi_out, 0, note + 7, 100);
+	gp->key_note[note_pos].note[0] = note;
+	gp->key_note[note_pos].note[1] = note + 4;
+	gp->key_note[note_pos].note[2] = note + 7;
 	gp->key_note[note_pos].notes = 3;
 }
 
@@ -52,10 +52,10 @@ static void ii_play_guitar_power_chord(II_GUITAR * gp, int note_pos)
 	int note = gp->chord_octave * 12 + ii_note_chart[gp->note_chart][note_pos];
 
 	ii_kill_guitar_note(gp, note_pos);
-	ii_send_note_on(gp->midi_out, 0, note - 4, 100);
-	ii_send_note_on(gp->midi_out, 0, note + 4, 100);
-	gp->key_note[note_pos].note[0] = note - 4;
-	gp->key_note[note_pos].note[1] = note + 4;
+	ii_send_note_on(gp->midi_out, 0, note, 100);
+	ii_send_note_on(gp->midi_out, 0, note + 7, 100);
+	gp->key_note[note_pos].note[0] = note;
+	gp->key_note[note_pos].note[1] = note + 7;
 	gp->key_note[note_pos].notes = 2;
 }
 

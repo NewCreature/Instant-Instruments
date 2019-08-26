@@ -49,12 +49,12 @@ static void ii_play_piano_chord(II_PIANO * pp, int note_pos)
 	int note = pp->octave * 12 + note_pos;
 
 	ii_kill_piano_note(pp, note_pos);
-	ii_send_note_on(pp->midi_out, 1, note - 4, 100);
 	ii_send_note_on(pp->midi_out, 1, note, 100);
 	ii_send_note_on(pp->midi_out, 1, note + 4, 100);
-	pp->key_note[note_pos].note[0] = note - 4;
-	pp->key_note[note_pos].note[1] = note;
-	pp->key_note[note_pos].note[2] = note + 4;
+	ii_send_note_on(pp->midi_out, 1, note + 7, 100);
+	pp->key_note[note_pos].note[0] = note;
+	pp->key_note[note_pos].note[1] = note + 4;
+	pp->key_note[note_pos].note[2] = note + 7;
 	pp->key_note[note_pos].notes = 3;
 }
 
