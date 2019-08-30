@@ -4,7 +4,6 @@
 
 #include "midi.h"
 #include "instrument.h"
-#include "controller.h"
 
 static int ii_note_chart[2][12] =
 {

@@ -5,7 +5,6 @@
 #include "midi.h"
 #include "instrument.h"
 #include "instrument_drum_set.h"
-#include "controller.h"
 
 static void ii_kill_drum_note(II_INSTRUMENT * ip, int note_pos)
 {

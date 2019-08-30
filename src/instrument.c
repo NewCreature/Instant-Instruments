@@ -8,7 +8,13 @@
 #include "instrument_guitar.h"
 #include "midi.h"
 #include "key.h"
-#include "controller.h"
+
+static void ii_set_controller_key(T3F_CONTROLLER * cp, int i, int key)
+{
+	cp->binding[i].type = T3F_CONTROLLER_BINDING_KEY;
+	cp->binding[i].button = key;
+	cp->binding[i].flags = 0;
+}
 
 II_INSTRUMENT * ii_load_instrument(const char * fn, MIDIA5_OUTPUT_HANDLE * hp)
 {

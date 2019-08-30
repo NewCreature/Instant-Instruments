@@ -5,7 +5,6 @@
 #include "midi.h"
 #include "instrument.h"
 #include "instrument_piano.h"
-#include "controller.h"
 
 static void ii_kill_piano_note(II_INSTRUMENT * ip, int note_pos)
 {
