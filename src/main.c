@@ -73,7 +73,6 @@ static int get_midi_device(void)
 	const char * val;
 	int val_i;
 	int device_count;
-	int i;
 
 	device_count = midia5_get_output_device_count();
 	val = al_get_config_value(t3f_config, "Settings", "midi_device");
@@ -88,12 +87,9 @@ static int get_midi_device(void)
 	else
 	{
 		/* look for FLUID Synth */
-		for(i = 0; i < device_count; i++)
+		if(get_fluidsynth_device() >= 0)
 		{
-			if(!memcmp(midia5_get_output_device_name(i), "FLUID", 5))
-			{
-				return i;
-			}
+			return get_fluidsynth_device();
 		}
 	}
 	if(device_count < 0)
@@ -143,6 +139,40 @@ static int get_midi_device(void)
 			}
 			return 0;
 		}
+
+		static void enable_fluidsynth(APP_INSTANCE * app)
+		{
+			int try = 0;
+			int i;
+
+			if(get_fluidsynth_device() < 0)
+			{
+				for(i = 0; i < 5; i++)
+				{
+					start_fluidsynth();
+					al_rest(0.5);
+					while(get_fluidsynth_device() < 0 && try < 5)
+					{
+						printf("FluidSynth device not found. Retrying...\n");
+						al_rest(0.5);
+						try++;
+					}
+					if(try < 5)
+					{
+						app->kill_fluidsynth = true;
+					}
+					else
+					{
+						stop_fluidsynth();
+						try = 0;
+					}
+				}
+			}
+			else
+			{
+				app->kill_fluidsynth = false;
+			}
+		}
 	#endif
 #endif
 
@@ -150,7 +180,6 @@ static int get_midi_device(void)
 bool app_initialize(APP_INSTANCE * app, int argc, char * argv[])
 {
 	int midi_device;
-	int try = 0;
 
 	/* initialize T3F */
 	if(!t3f_initialize(T3F_APP_TITLE, 640, 480, 60.0, app_logic, app_render, T3F_DEFAULT, app))
@@ -162,27 +191,7 @@ bool app_initialize(APP_INSTANCE * app, int argc, char * argv[])
 
 	#ifdef ALLEGRO_UNIX
 		#ifndef ALLEGRO_MACOSX
-			if(get_fluidsynth_device() < 0)
-			{
-				start_fluidsynth();
-				al_rest(1.0);
-				while(get_fluidsynth_device() < 0 && try < 5)
-				{
-					printf("FluidSynth device not found. Retrying...\n");
-					stop_fluidsynth();
-					start_fluidsynth();
-					al_rest(1.0);
-					try++;
-				}
-				if(try < 5)
-				{
-					app->kill_fluidsynth = true;
-				}
-			}
-			else
-			{
-				app->kill_fluidsynth = false;
-			}
+			enable_fluidsynth(app);
 		#endif
 	#endif
 	midi_device = get_midi_device();
