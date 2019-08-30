@@ -3,22 +3,18 @@
 #include "rtk/midi.h"
 #include "MIDIA5/midia5.h"
 
-#include "guitar.h"
-#include "piano.h"
-#include "drums.h"
+#include "instrument.h"
 
 /* structure to hold all of our app-specific data */
 typedef struct
 {
 
 	MIDIA5_OUTPUT_HANDLE * midi_out;
-	II_GUITAR * guitar;
-	II_PIANO * piano[2];
-	II_DRUMS * drums;
+	II_INSTRUMENT * guitar;
+	II_INSTRUMENT * piano[2];
+	II_INSTRUMENT * drums;
 	bool kill_fluidsynth;
 
-	int key_row_1_octave;
-	int key_row_2_octave;
 	int state;
 
 } APP_INSTANCE;
@@ -35,10 +31,10 @@ void app_logic(void * data)
 			/* insert logic here, as your project grows you can add more states
 			 * to deal with various parts of your app (logo, title screen, in-
 			 * game, etc.) */
-			ii_guitar_logic(app->guitar);
-			ii_piano_logic(app->piano[0]);
-			ii_piano_logic(app->piano[1]);
-			ii_drums_logic(app->drums);
+			ii_instrument_logic(app->guitar);
+			ii_instrument_logic(app->piano[0]);
+			ii_instrument_logic(app->piano[1]);
+			ii_instrument_logic(app->drums);
 			break;
 		}
 	}
@@ -206,7 +202,7 @@ bool app_initialize(APP_INSTANCE * app, int argc, char * argv[])
 	}
 
 	/* set up guitar controller */
-	app->guitar = ii_create_guitar(app->midi_out, ALLEGRO_KEY_ESCAPE);
+	app->guitar = ii_create_instrument(app->midi_out, 0, II_INSTRUMENT_TYPE_GUITAR, 0);
 	if(!app->guitar)
 	{
 		printf("Failed to create guitar!\n");
@@ -214,13 +210,13 @@ bool app_initialize(APP_INSTANCE * app, int argc, char * argv[])
 	}
 
 	/* set up piano controllers */
-	app->piano[0] = ii_create_piano(app->midi_out, 0, ALLEGRO_KEY_A);
+	app->piano[0] = ii_create_instrument(app->midi_out, 1, II_INSTRUMENT_TYPE_PIANO, 0);
 	if(!app->piano[0])
 	{
 		printf("Failed to create piano!\n");
 		return false;
 	}
-	app->piano[1] = ii_create_piano(app->midi_out, 1, ALLEGRO_KEY_1);
+	app->piano[1] = ii_create_instrument(app->midi_out, 2, II_INSTRUMENT_TYPE_PIANO, 1);
 	if(!app->piano[1])
 	{
 		printf("Failed to create piano!\n");
@@ -228,7 +224,7 @@ bool app_initialize(APP_INSTANCE * app, int argc, char * argv[])
 	}
 
 	/* set up drums controllers */
-	app->drums = ii_create_drums(app->midi_out, ALLEGRO_KEY_SPACE);
+	app->drums = ii_create_instrument(app->midi_out, 9, II_INSTRUMENT_TYPE_DRUM_SET, 0);
 	if(!app->drums)
 	{
 		printf("Failed to create drums!\n");
@@ -265,19 +261,19 @@ int main(int argc, char * argv[])
 	#endif
 	if(app.guitar)
 	{
-		ii_destroy_guitar(app.guitar);
+		ii_destroy_instrument(app.guitar);
 	}
 	if(app.piano[0])
 	{
-		ii_destroy_piano(app.piano[0]);
+		ii_destroy_instrument(app.piano[0]);
 	}
 	if(app.piano[1])
 	{
-		ii_destroy_piano(app.piano[1]);
+		ii_destroy_instrument(app.piano[1]);
 	}
 	if(app.drums)
 	{
-		ii_destroy_drums(app.drums);
+		ii_destroy_instrument(app.drums);
 	}
 	t3f_finish();
 	return 0;
