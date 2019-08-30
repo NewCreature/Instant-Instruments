@@ -28,9 +28,6 @@ void app_logic(void * data)
 	{
 		default:
 		{
-			/* insert logic here, as your project grows you can add more states
-			 * to deal with various parts of your app (logo, title screen, in-
-			 * game, etc.) */
 			ii_instrument_logic(app->guitar);
 			ii_instrument_logic(app->piano[0]);
 			ii_instrument_logic(app->piano[1]);
