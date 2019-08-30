@@ -129,6 +129,24 @@ void ii_instrument_logic(II_INSTRUMENT * ip)
 			ii_send_program_change(ip->midi_out, ip->channel, ip->program);
 			t3f_key[ALLEGRO_KEY_UP] = 0;
 		}
+		if(t3f_key[ALLEGRO_KEY_LEFT])
+		{
+			ip->base_note -= 12;
+			if(ip->base_note < 0)
+			{
+				ip->base_note = 108;
+			}
+			t3f_key[ALLEGRO_KEY_LEFT] = 0;
+		}
+		if(t3f_key[ALLEGRO_KEY_RIGHT])
+		{
+			ip->base_note += 12;
+			if(ip->base_note > 108)
+			{
+				ip->base_note = 0;
+			}
+			t3f_key[ALLEGRO_KEY_RIGHT] = 0;
+		}
 	}
 	else
 	{
