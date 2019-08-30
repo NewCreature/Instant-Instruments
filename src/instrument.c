@@ -8,73 +8,90 @@
 #include "instrument_guitar.h"
 #include "midi.h"
 #include "key.h"
+#include "controller.h"
 
-II_INSTRUMENT * ii_create_instrument(MIDIA5_OUTPUT_HANDLE * hp, int channel, int type, int option)
+II_INSTRUMENT * ii_load_instrument(const char * fn, MIDIA5_OUTPUT_HANDLE * hp)
 {
+	ALLEGRO_CONFIG * cp;
 	II_INSTRUMENT * ip = NULL;
+	const char * val;
+	char buf[256];
+	int inputs = 0;
+	int i;
 
-	ip = malloc(sizeof(II_INSTRUMENT));
-	if(!ip)
+	cp = al_load_config_file(fn);
+	if(cp)
 	{
-		goto fail;
-	}
-	memset(ip, 0, sizeof(II_INSTRUMENT));
-	ip->midi_out = hp;
-	ip->channel = channel;
-	ip->type = type;
+		ip = malloc(sizeof(II_INSTRUMENT));
+		if(!ip)
+		{
+			goto fail;
+		}
+		memset(ip, 0, sizeof(II_INSTRUMENT));
+		ip->midi_out = hp;
 
-	/* create controller */
-	switch(ip->type)
-	{
-		case II_INSTRUMENT_TYPE_DRUM_SET:
+		val = al_get_config_value(cp, "Settings", "type");
+		if(val)
 		{
-			ip->controller = ii_create_drum_set_controller(option);
-			break;
+			ip->type = atoi(val);
 		}
-		case II_INSTRUMENT_TYPE_PIANO:
+		val = al_get_config_value(cp, "Settings", "channel");
+		if(val)
 		{
-			ip->controller = ii_create_piano_controller(option);
-			ip->base_note = 3 * 12 + option * 3 * 12;
-			ip->chord_base_note = 3 * 12 + option * 3 * 12;
-			break;
+			ip->channel = atoi(val);
 		}
-		case II_INSTRUMENT_TYPE_GUITAR:
+		val = al_get_config_value(cp, "Settings", "program");
+		if(val)
 		{
-			ip->controller = ii_create_guitar_controller(option);
-			ip->base_note = 6 * 12;
-			ip->chord_base_note = 3 * 12;
-			break;
+			ip->program = atoi(val);
 		}
+		val = al_get_config_value(cp, "Settings", "base_note");
+		if(val)
+		{
+			ip->base_note = atoi(val);
+		}
+		val = al_get_config_value(cp, "Settings", "chord_base_note");
+		if(val)
+		{
+			ip->chord_base_note = atoi(val);
+		}
+		val = al_get_config_value(cp, "Settings", "inputs");
+		if(val)
+		{
+			inputs = atoi(val);
+		}
+		if(inputs > 0)
+		{
+			ip->controller = t3f_create_controller(inputs);
+			if(!ip->controller)
+			{
+				goto fail;
+			}
+			for(i = 0; i < inputs; i++)
+			{
+				sprintf(buf, "input_%d_key", i);
+				val = al_get_config_value(cp, "Settings", buf);
+				if(val)
+				{
+					ii_set_controller_key(ip->controller, i, atoi(val));
+				}
+				ip->key_rel_note[i] = i;
+				sprintf(buf, "input_%d_rel_note", i);
+				val = al_get_config_value(cp, "Settings", buf);
+				if(val)
+				{
+					ip->key_rel_note[i] = atoi(val);
+				}
+			}
+			t3f_clear_controller_state(ip->controller);
+		}
+		else
+		{
+			goto fail;
+		}
+		ii_send_program_change(ip->midi_out, ip->channel, ip->program);
+		return ip;
 	}
-	if(!ip->controller)
-	{
-		goto fail;
-	}
-
-	/* set current MIDI program */
-	switch(ip->type)
-	{
-		case II_INSTRUMENT_TYPE_DRUM_SET:
-		{
-			ip->program = 0;
-			ii_send_program_change(ip->midi_out, ip->channel, ip->program);
-			break;
-		}
-		case II_INSTRUMENT_TYPE_PIANO:
-		{
-			ip->program = 0;
-			ii_send_program_change(ip->midi_out, ip->channel, ip->program);
-			break;
-		}
-		case II_INSTRUMENT_TYPE_GUITAR:
-		{
-			ip->program = 30;
-			ii_send_program_change(ip->midi_out, ip->channel, ip->program);
-			break;
-		}
-	}
-
-	return ip;
 
 	fail:
 	{

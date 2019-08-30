@@ -202,7 +202,7 @@ bool app_initialize(APP_INSTANCE * app, int argc, char * argv[])
 	}
 
 	/* set up guitar controller */
-	app->guitar = ii_create_instrument(app->midi_out, 0, II_INSTRUMENT_TYPE_GUITAR, 0);
+	app->guitar = ii_load_instrument("data/instrument_guitar.ini", app->midi_out);
 	if(!app->guitar)
 	{
 		printf("Failed to create guitar!\n");
@@ -210,13 +210,13 @@ bool app_initialize(APP_INSTANCE * app, int argc, char * argv[])
 	}
 
 	/* set up piano controllers */
-	app->piano[0] = ii_create_instrument(app->midi_out, 1, II_INSTRUMENT_TYPE_PIANO, 0);
+	app->piano[0] = ii_load_instrument("data/instrument_piano_0.ini", app->midi_out);
 	if(!app->piano[0])
 	{
 		printf("Failed to create piano!\n");
 		return false;
 	}
-	app->piano[1] = ii_create_instrument(app->midi_out, 2, II_INSTRUMENT_TYPE_PIANO, 1);
+	app->piano[1] = ii_load_instrument("data/instrument_piano_1.ini", app->midi_out);
 	if(!app->piano[1])
 	{
 		printf("Failed to create piano!\n");
@@ -224,7 +224,7 @@ bool app_initialize(APP_INSTANCE * app, int argc, char * argv[])
 	}
 
 	/* set up drums controllers */
-	app->drums = ii_create_instrument(app->midi_out, 9, II_INSTRUMENT_TYPE_DRUM_SET, 0);
+	app->drums = ii_load_instrument("data/instrument_drum_set.ini", app->midi_out);
 	if(!app->drums)
 	{
 		printf("Failed to create drums!\n");

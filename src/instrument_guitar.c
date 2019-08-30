@@ -25,7 +25,7 @@ static void ii_kill_guitar_note(II_INSTRUMENT * ip, int note_pos)
 
 static void ii_play_guitar_note(II_INSTRUMENT * ip, int note_pos)
 {
-	int note = ip->base_note + ii_note_chart[ip->mode][note_pos];
+	int note = ip->base_note + ii_note_chart[ip->mode][ip->key_rel_note[note_pos]];
 
 	ii_kill_guitar_note(ip, note_pos);
 	ii_send_note_on(ip->midi_out, ip->channel, note, 100);
@@ -35,7 +35,7 @@ static void ii_play_guitar_note(II_INSTRUMENT * ip, int note_pos)
 
 static void ii_play_guitar_chord(II_INSTRUMENT * ip, int note_pos)
 {
-	int note = ip->chord_base_note + ii_note_chart[ip->mode][note_pos];
+	int note = ip->chord_base_note + ii_note_chart[ip->mode][ip->key_rel_note[note_pos]];
 
 	ii_kill_guitar_note(ip, note_pos);
 	ii_send_note_on(ip->midi_out, ip->channel, note, 100);
@@ -49,7 +49,7 @@ static void ii_play_guitar_chord(II_INSTRUMENT * ip, int note_pos)
 
 static void ii_play_guitar_power_chord(II_INSTRUMENT * ip, int note_pos)
 {
-	int note = ip->chord_base_note + ii_note_chart[ip->mode][note_pos];
+	int note = ip->chord_base_note + ii_note_chart[ip->mode][ip->key_rel_note[note_pos]];
 
 	ii_kill_guitar_note(ip, note_pos);
 	ii_send_note_on(ip->midi_out, ip->channel, note, 100);
@@ -57,31 +57,6 @@ static void ii_play_guitar_power_chord(II_INSTRUMENT * ip, int note_pos)
 	ip->key_note[note_pos].note[0] = note;
 	ip->key_note[note_pos].note[1] = note + 7;
 	ip->key_note[note_pos].notes = 2;
-}
-
-T3F_CONTROLLER * ii_create_guitar_controller(int option)
-{
-	T3F_CONTROLLER * cp = NULL;
-	int i;
-
-	cp = t3f_create_controller(14);
-	if(!cp)
-	{
-		return NULL;
-	}
-	for(i = 0; i < 12; i++)
-	{
-		ii_set_controller_key(cp, i, ALLEGRO_KEY_F1 + i);
-	}
-	#ifdef ALLEGRO_MACOSX
-		ii_set_controller_key(cp, 12, ALLEGRO_KEY_LSHIFT);
-	#else
-		ii_set_controller_key(cp, 12, ALLEGRO_KEY_RSHIFT);
-	#endif
-	ii_set_controller_key(cp, 13, ALLEGRO_KEY_ESCAPE);
-	t3f_clear_controller_state(cp);
-
-	return cp;
 }
 
 void ii_guitar_logic(II_INSTRUMENT * ip)
@@ -92,7 +67,7 @@ void ii_guitar_logic(II_INSTRUMENT * ip)
 
 	/* detect chords */
 	c = 0;
-	for(i = 0; i < 12; i++)
+	for(i = 0; i < ip->controller->bindings - 2; i++)
 	{
 		if(ip->controller->state[i].held)
 		{
@@ -109,9 +84,9 @@ void ii_guitar_logic(II_INSTRUMENT * ip)
 		c++;
 	}
 
-	if(ip->controller->state[12].pressed)
+	if(ip->controller->state[ip->controller->bindings - 2].pressed)
 	{
-		for(i = 0; i < 12; i++)
+		for(i = 0; i < ip->controller->bindings - 2; i++)
 		{
 			if(ip->controller->state[i].held)
 			{
@@ -135,9 +110,9 @@ void ii_guitar_logic(II_INSTRUMENT * ip)
 		}
 	}
 	/* check for hammer-on/pull-off */
-	else if(ip->controller->state[12].held)
+	else if(ip->controller->state[ip->controller->bindings - 2].held)
 	{
-		for(i = 0; i < 12; i++)
+		for(i = 0; i < ip->controller->bindings - 2; i++)
 		{
 			if(ip->controller->state[i].pressed)
 			{
@@ -149,7 +124,7 @@ void ii_guitar_logic(II_INSTRUMENT * ip)
 			}
 		}
 	}
-	for(i = 0; i < 12; i++)
+	for(i = 0; i < ip->controller->bindings - 2; i++)
 	{
 		if(ip->controller->state[i].released)
 		{

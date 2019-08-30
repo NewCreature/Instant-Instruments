@@ -7,7 +7,7 @@
 
 #include "key.h"
 
-#define II_INSTRUMENT_MAX_KEY_NOTES 24
+#define II_INSTRUMENT_MAX_KEY_NOTES 48
 
 #define II_INSTRUMENT_TYPE_DRUM_SET  0
 #define II_INSTRUMENT_TYPE_PIANO     1
@@ -26,10 +26,11 @@ typedef struct
 	int base_note;
 	int chord_base_note;
 	II_KEY_NOTE key_note[II_INSTRUMENT_MAX_KEY_NOTES];
+	int key_rel_note[II_INSTRUMENT_MAX_KEY_NOTES];
 
 } II_INSTRUMENT;
 
-II_INSTRUMENT * ii_create_instrument(MIDIA5_OUTPUT_HANDLE * hp, int channel, int type, int option);
+II_INSTRUMENT * ii_load_instrument(const char * fn, MIDIA5_OUTPUT_HANDLE * hp);
 void ii_destroy_instrument(II_INSTRUMENT * ip);
 
 void ii_instrument_logic(II_INSTRUMENT * ip);
