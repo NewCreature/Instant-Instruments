@@ -185,7 +185,7 @@ bool app_initialize(APP_INSTANCE * app, int argc, char * argv[])
 	int midi_device;
 
 	/* initialize T3F */
-	if(!t3f_initialize(T3F_APP_TITLE, 640, 480, 60.0, app_logic, app_render, T3F_DEFAULT, app))
+	if(!t3f_initialize(T3F_APP_TITLE, 960, 540, 60.0, app_logic, app_render, T3F_DEFAULT | T3F_RESIZABLE, app))
 	{
 		printf("Error initializing T3F\n");
 		return false;
