@@ -9,6 +9,9 @@
 #include "midi_event.h"
 #include "key.h"
 
+static char command_buffer[256] = {0};
+static int command_buffer_pos = 0;
+
 static void ii_set_controller_key(T3F_CONTROLLER * cp, int i, int key)
 {
 	cp->binding[i].type = T3F_CONTROLLER_BINDING_KEY;
@@ -118,8 +121,25 @@ void ii_destroy_instrument(II_INSTRUMENT * ip)
 	}
 }
 
+static void clear_command_buffer(void)
+{
+	strcpy(command_buffer, "");
+	command_buffer_pos = 0;
+}
+
+static void append_command_buffer(int key)
+{
+	if(command_buffer_pos < 255)
+	{
+		command_buffer[command_buffer_pos] = key;
+		command_buffer_pos++;
+		command_buffer[command_buffer_pos] = 0;
+	}
+}
+
 void ii_instrument_logic(II_INSTRUMENT * ip)
 {
+	int program;
 
 	if(t3f_key[ALLEGRO_KEY_TAB])
 	{
@@ -130,8 +150,72 @@ void ii_instrument_logic(II_INSTRUMENT * ip)
 	t3f_read_controller(ip->controller);
 	t3f_update_controller(ip->controller);
 
+	if(ip->controller->state[ip->controller->bindings - 1].pressed)
+	{
+		clear_command_buffer();
+	}
+	if(ip->controller->state[ip->controller->bindings - 1].released)
+	{
+		program = atoi(command_buffer);
+		if(program > 0 && program <= 128)
+		{
+			ip->program = program - 1;
+			ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_PROGRAM_CHANGE, ip->channel, ip->program, 0, 1);
+		}
+		clear_command_buffer();
+	}
 	if(ip->controller->state[ip->controller->bindings - 1].held)
 	{
+		if(t3f_key[ALLEGRO_KEY_PAD_0])
+		{
+			append_command_buffer('0');
+			t3f_key[ALLEGRO_KEY_PAD_0] = 0;
+		}
+		if(t3f_key[ALLEGRO_KEY_PAD_1])
+		{
+			append_command_buffer('1');
+			t3f_key[ALLEGRO_KEY_PAD_1] = 0;
+		}
+		if(t3f_key[ALLEGRO_KEY_PAD_2])
+		{
+			append_command_buffer('2');
+			t3f_key[ALLEGRO_KEY_PAD_2] = 0;
+		}
+		if(t3f_key[ALLEGRO_KEY_PAD_3])
+		{
+			append_command_buffer('3');
+			t3f_key[ALLEGRO_KEY_PAD_3] = 0;
+		}
+		if(t3f_key[ALLEGRO_KEY_PAD_4])
+		{
+			append_command_buffer('4');
+			t3f_key[ALLEGRO_KEY_PAD_4] = 0;
+		}
+		if(t3f_key[ALLEGRO_KEY_PAD_5])
+		{
+			append_command_buffer('5');
+			t3f_key[ALLEGRO_KEY_PAD_5] = 0;
+		}
+		if(t3f_key[ALLEGRO_KEY_PAD_6])
+		{
+			append_command_buffer('6');
+			t3f_key[ALLEGRO_KEY_PAD_6] = 0;
+		}
+		if(t3f_key[ALLEGRO_KEY_PAD_7])
+		{
+			append_command_buffer('7');
+			t3f_key[ALLEGRO_KEY_PAD_7] = 0;
+		}
+		if(t3f_key[ALLEGRO_KEY_PAD_8])
+		{
+			append_command_buffer('8');
+			t3f_key[ALLEGRO_KEY_PAD_8] = 0;
+		}
+		if(t3f_key[ALLEGRO_KEY_PAD_9])
+		{
+			append_command_buffer('9');
+			t3f_key[ALLEGRO_KEY_PAD_9] = 0;
+		}
 		if(t3f_key[ALLEGRO_KEY_DOWN])
 		{
 			ip->program--;
