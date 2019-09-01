@@ -1,12 +1,12 @@
 #include "t3f/t3f.h"
 #include "t3f/controller.h"
-#include "MIDIA5/midia5.h"
+#include "rtk/midi.h"
 
 #include "instrument.h"
 #include "instrument_drum_set.h"
 #include "instrument_piano.h"
 #include "instrument_guitar.h"
-#include "midi.h"
+#include "midi_event.h"
 #include "key.h"
 
 static void ii_set_controller_key(T3F_CONTROLLER * cp, int i, int key)
@@ -16,7 +16,7 @@ static void ii_set_controller_key(T3F_CONTROLLER * cp, int i, int key)
 	cp->binding[i].flags = 0;
 }
 
-II_INSTRUMENT * ii_load_instrument(const char * fn, MIDIA5_OUTPUT_HANDLE * hp)
+II_INSTRUMENT * ii_load_instrument(const char * fn, II_MIDI_EVENT_BATCH * bp)
 {
 	ALLEGRO_CONFIG * cp;
 	II_INSTRUMENT * ip = NULL;
@@ -34,7 +34,7 @@ II_INSTRUMENT * ii_load_instrument(const char * fn, MIDIA5_OUTPUT_HANDLE * hp)
 			goto fail;
 		}
 		memset(ip, 0, sizeof(II_INSTRUMENT));
-		ip->midi_out = hp;
+		ip->midi_event_batch = bp;
 
 		val = al_get_config_value(cp, "Settings", "type");
 		if(val)
@@ -95,7 +95,7 @@ II_INSTRUMENT * ii_load_instrument(const char * fn, MIDIA5_OUTPUT_HANDLE * hp)
 		{
 			goto fail;
 		}
-		ii_send_program_change(ip->midi_out, ip->channel, ip->program);
+		ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_PROGRAM_CHANGE, ip->channel, ip->program, 0, 1);
 		return ip;
 	}
 
@@ -139,7 +139,7 @@ void ii_instrument_logic(II_INSTRUMENT * ip)
 			{
 				ip->program = 127;
 			}
-			ii_send_program_change(ip->midi_out, ip->channel, ip->program);
+			ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_PROGRAM_CHANGE, ip->channel, ip->program, 0, 1);
 			t3f_key[ALLEGRO_KEY_DOWN] = 0;
 		}
 		if(t3f_key[ALLEGRO_KEY_UP])
@@ -149,7 +149,7 @@ void ii_instrument_logic(II_INSTRUMENT * ip)
 			{
 				ip->program = 0;
 			}
-			ii_send_program_change(ip->midi_out, ip->channel, ip->program);
+			ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_PROGRAM_CHANGE, ip->channel, ip->program, 0, 1);
 			t3f_key[ALLEGRO_KEY_UP] = 0;
 		}
 		if(t3f_key[ALLEGRO_KEY_LEFT])

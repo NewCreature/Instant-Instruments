@@ -3,6 +3,7 @@
 #include "rtk/midi.h"
 #include "MIDIA5/midia5.h"
 
+#include "midi_event.h"
 #include "instrument.h"
 
 /* structure to hold all of our app-specific data */
@@ -10,6 +11,7 @@ typedef struct
 {
 
 	MIDIA5_OUTPUT_HANDLE * midi_out;
+	II_MIDI_EVENT_BATCH * midi_event_batch;
 	II_INSTRUMENT * guitar;
 	II_INSTRUMENT * piano[2];
 	II_INSTRUMENT * drums;
@@ -32,6 +34,7 @@ void app_logic(void * data)
 			ii_instrument_logic(app->piano[0]);
 			ii_instrument_logic(app->piano[1]);
 			ii_instrument_logic(app->drums);
+			ii_process_midi_event_batch(app->midi_event_batch);
 			break;
 		}
 	}
@@ -206,9 +209,15 @@ bool app_initialize(APP_INSTANCE * app, int argc, char * argv[])
 		printf("Could not get MIDI output device!\n");
 		return false;
 	}
+	app->midi_event_batch = ii_create_midi_event_batch(app->midi_out, 256);
+	if(!app->midi_event_batch)
+	{
+		printf("Could not create MIDI event batch!\n");
+		return false;
+	}
 
 	/* set up guitar controller */
-	app->guitar = ii_load_instrument("data/instrument_guitar.ini", app->midi_out);
+	app->guitar = ii_load_instrument("data/instrument_guitar.ini", app->midi_event_batch);
 	if(!app->guitar)
 	{
 		printf("Failed to create guitar!\n");
@@ -216,13 +225,13 @@ bool app_initialize(APP_INSTANCE * app, int argc, char * argv[])
 	}
 
 	/* set up piano controllers */
-	app->piano[0] = ii_load_instrument("data/instrument_piano_0.ini", app->midi_out);
+	app->piano[0] = ii_load_instrument("data/instrument_piano_0.ini", app->midi_event_batch);
 	if(!app->piano[0])
 	{
 		printf("Failed to create piano!\n");
 		return false;
 	}
-	app->piano[1] = ii_load_instrument("data/instrument_piano_1.ini", app->midi_out);
+	app->piano[1] = ii_load_instrument("data/instrument_piano_1.ini", app->midi_event_batch);
 	if(!app->piano[1])
 	{
 		printf("Failed to create piano!\n");
@@ -230,7 +239,7 @@ bool app_initialize(APP_INSTANCE * app, int argc, char * argv[])
 	}
 
 	/* set up drums controllers */
-	app->drums = ii_load_instrument("data/instrument_drum_set.ini", app->midi_out);
+	app->drums = ii_load_instrument("data/instrument_drum_set.ini", app->midi_event_batch);
 	if(!app->drums)
 	{
 		printf("Failed to create drums!\n");

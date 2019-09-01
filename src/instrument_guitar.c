@@ -1,8 +1,8 @@
 #include "t3f/t3f.h"
 #include "t3f/controller.h"
-#include "MIDIA5/midia5.h"
+#include "rtk/midi.h"
 
-#include "midi.h"
+#include "midi_event.h"
 #include "instrument.h"
 
 static int ii_note_chart[2][12] =
@@ -17,7 +17,7 @@ static void ii_kill_guitar_note(II_INSTRUMENT * ip, int note_pos)
 
 	for(i = 0; i < ip->key_note[note_pos].notes; i++)
 	{
-		ii_send_note_off(ip->midi_out, ip->channel, ip->key_note[note_pos].note[i], 100);
+		ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_NOTE_OFF, ip->channel, ip->key_note[note_pos].note[i], 100, 1);
 	}
 	ip->key_note[note_pos].notes = 0;
 }
@@ -27,7 +27,7 @@ static void ii_play_guitar_note(II_INSTRUMENT * ip, int note_pos)
 	int note = ip->base_note + ii_note_chart[ip->mode][ip->key_rel_note[note_pos]];
 
 	ii_kill_guitar_note(ip, note_pos);
-	ii_send_note_on(ip->midi_out, ip->channel, note, 100);
+	ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_NOTE_ON, ip->channel, note, 100, 1);
 	ip->key_note[note_pos].note[0] = note;
 	ip->key_note[note_pos].notes = 1;
 }
@@ -37,9 +37,9 @@ static void ii_play_guitar_chord(II_INSTRUMENT * ip, int note_pos)
 	int note = ip->chord_base_note + ii_note_chart[ip->mode][ip->key_rel_note[note_pos]];
 
 	ii_kill_guitar_note(ip, note_pos);
-	ii_send_note_on(ip->midi_out, ip->channel, note, 100);
-	ii_send_note_on(ip->midi_out, ip->channel, note + 4, 100);
-	ii_send_note_on(ip->midi_out, ip->channel, note + 7, 100);
+	ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_NOTE_ON, ip->channel, note, 100, 1);
+	ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_NOTE_ON, ip->channel, note + 4, 100, 1);
+	ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_NOTE_ON, ip->channel, note + 7, 100, 1);
 	ip->key_note[note_pos].note[0] = note;
 	ip->key_note[note_pos].note[1] = note + 4;
 	ip->key_note[note_pos].note[2] = note + 7;
@@ -51,8 +51,8 @@ static void ii_play_guitar_power_chord(II_INSTRUMENT * ip, int note_pos)
 	int note = ip->chord_base_note + ii_note_chart[ip->mode][ip->key_rel_note[note_pos]];
 
 	ii_kill_guitar_note(ip, note_pos);
-	ii_send_note_on(ip->midi_out, ip->channel, note, 100);
-	ii_send_note_on(ip->midi_out, ip->channel, note + 7, 100);
+	ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_NOTE_ON, ip->channel, note, 100, 1);
+	ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_NOTE_ON, ip->channel, note + 7, 100, 1);
 	ip->key_note[note_pos].note[0] = note;
 	ip->key_note[note_pos].note[1] = note + 7;
 	ip->key_note[note_pos].notes = 2;

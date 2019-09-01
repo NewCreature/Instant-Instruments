@@ -3,8 +3,8 @@
 
 #include "t3f/t3f.h"
 #include "t3f/controller.h"
-#include "MIDIA5/midia5.h"
 
+#include "midi_event.h"
 #include "key.h"
 
 #define II_INSTRUMENT_MAX_KEY_NOTES 48
@@ -16,7 +16,7 @@
 typedef struct
 {
 
-	MIDIA5_OUTPUT_HANDLE * midi_out;
+	II_MIDI_EVENT_BATCH * midi_event_batch;
 	T3F_CONTROLLER * controller;
 	int type;
 
@@ -30,7 +30,7 @@ typedef struct
 
 } II_INSTRUMENT;
 
-II_INSTRUMENT * ii_load_instrument(const char * fn, MIDIA5_OUTPUT_HANDLE * hp);
+II_INSTRUMENT * ii_load_instrument(const char * fn, II_MIDI_EVENT_BATCH * bp);
 void ii_destroy_instrument(II_INSTRUMENT * ip);
 
 void ii_instrument_logic(II_INSTRUMENT * ip);
