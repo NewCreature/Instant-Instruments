@@ -90,7 +90,7 @@ void ii_guitar_logic(II_INSTRUMENT * ip)
 
 	/* detect chords */
 	c = 0;
-	for(i = 0; i < ip->controller->bindings - 4; i++)
+	for(i = 0; i < ip->controller->bindings - 5; i++)
 	{
 		if(ip->controller->state[i].held)
 		{
@@ -107,19 +107,19 @@ void ii_guitar_logic(II_INSTRUMENT * ip)
 		c++;
 	}
 
-	if(ip->controller->state[ip->controller->bindings - 4].pressed)
+	if(ip->controller->state[ip->controller->bindings - 5].pressed)
 	{
 		strum = true;
 		mute = 0;
 		delay = 0;
 	}
-	if(ip->controller->state[ip->controller->bindings - 3].pressed)
+	if(ip->controller->state[ip->controller->bindings - 4].pressed)
 	{
 		strum = true;
 		mute = 0;
 		delay = 4;
 	}
-	if(ip->controller->state[ip->controller->bindings - 2].pressed)
+	if(ip->controller->state[ip->controller->bindings - 3].pressed)
 	{
 		strum = true;
 		mute = 6;
@@ -127,7 +127,7 @@ void ii_guitar_logic(II_INSTRUMENT * ip)
 	}
 	if(strum)
 	{
-		for(i = 0; i < ip->controller->bindings - 4; i++)
+		for(i = 0; i < ip->controller->bindings - 5; i++)
 		{
 			if(ip->controller->state[i].held)
 			{
@@ -151,9 +151,9 @@ void ii_guitar_logic(II_INSTRUMENT * ip)
 		}
 	}
 	/* check for hammer-on/pull-off */
-	else if(ip->controller->state[ip->controller->bindings - 2].held)
+	else if(ip->controller->state[ip->controller->bindings - 5].held)
 	{
-		for(i = 0; i < ip->controller->bindings - 2; i++)
+		for(i = 0; i < ip->controller->bindings - 5; i++)
 		{
 			if(ip->controller->state[i].pressed)
 			{
@@ -165,9 +165,9 @@ void ii_guitar_logic(II_INSTRUMENT * ip)
 			}
 		}
 	}
-	for(i = 0; i < ip->controller->bindings - 2; i++)
+	for(i = 0; i < ip->controller->bindings - 5; i++)
 	{
-		if(ip->controller->state[i].released)
+		if(ip->controller->state[i].released || ip->controller->state[ip->controller->bindings - 2].pressed)
 		{
 			ii_kill_guitar_note(ip, i);
 		}
