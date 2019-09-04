@@ -5,6 +5,7 @@ typedef struct
 {
 
 	int note[16];
+	int delay[16];
 	int notes;
 
 } II_KEY_NOTE;
