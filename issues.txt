@@ -16,9 +16,9 @@ Instant Instruments Issues
 
 [X]Disable instrument controls when the instrument function key is held.
 
-[ ]Add graphical UI.
+[X]Implement shifting the base note for each instrument by a relnote.
 
-[ ]Implement shifting the base note for each instrument by a relnote.
+[ ]Add graphical UI.
 
 [ ]Add metronome.
 
