@@ -140,6 +140,7 @@ static void append_command_buffer(int key)
 void ii_instrument_logic(II_INSTRUMENT * ip)
 {
 	int program;
+	int shift_amount;
 
 	if(t3f_key[ALLEGRO_KEY_TAB])
 	{
@@ -236,9 +237,17 @@ void ii_instrument_logic(II_INSTRUMENT * ip)
 			ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_PROGRAM_CHANGE, ip->channel, ip->program, 0, 1);
 			t3f_key[ALLEGRO_KEY_UP] = 0;
 		}
+		if(t3f_key[ALLEGRO_KEY_LSHIFT])
+		{
+			shift_amount = 1;
+		}
+		else
+		{
+			shift_amount = 12;
+		}
 		if(t3f_key[ALLEGRO_KEY_LEFT])
 		{
-			ip->base_note -= 12;
+			ip->base_note -= shift_amount;
 			if(ip->base_note < 0)
 			{
 				ip->base_note = 108;
@@ -247,7 +256,7 @@ void ii_instrument_logic(II_INSTRUMENT * ip)
 		}
 		if(t3f_key[ALLEGRO_KEY_RIGHT])
 		{
-			ip->base_note += 12;
+			ip->base_note += shift_amount;
 			if(ip->base_note > 108)
 			{
 				ip->base_note = 0;
