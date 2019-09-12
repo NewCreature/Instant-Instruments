@@ -23,7 +23,7 @@ keyboard. You can use either a guitar-, piano-, or drum-style interface.
 
 ## Getting Started
 
-UAfter opening Instant Instruments, you can immediately start playing sounds and
+After opening Instant Instruments, you can immediately start playing sounds and
 music using any of the three available input methods.
 
 ### Instant Piano
