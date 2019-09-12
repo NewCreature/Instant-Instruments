@@ -7,6 +7,23 @@ keyboard. You can use either a guitar-, piano-, or drum-style interface.
 After opening Instant Instruments, you can immediately start playing sounds and
 music using any of the three available input methods.
 
+## System Requirements
+
+### Windows
+
+Windows XP or newer
+Sound device
+
+### MacOS
+
+MacOS 10.6 or newer
+
+### Linux
+
+Sound device
+FluidSynth (fluidsynth)
+Fluid General MIDI SoundFont (fluid-soundfont-gm)
+
 ## Instant Piano
 
 The piano layout is as follows:
@@ -17,14 +34,19 @@ The piano layout is as follows:
      S D   G H J   L ;
     Z X C V B N M , . /
 
-Each row of piano keys can be customized to play different instruments and
-octaves (not implemented yet).
+The keys are mapped to mimic the layout of a piano. Press and hold any of the
+keys listed above to play notes. Holding Ctrl while pressing a key will play a
+chord with that key's note as its base note.
 
 Each row of piano keys has its own function key which can be used in combination
 with other keys to change the settings for that particular piano. The top row
-function key is '1' and the bottom row function key is 'A'. Holding the function
-key while pressing the Up or Down key will change the program (instrument sound)
-used by that row.
+function key is '1' and the bottom row function key is 'A'.
+
+Holding the function key while pressing the Up or Down key will change the
+program (instrument sound) used by that row. Holding the function key while
+pressing the Left or Right key will change the base note by one octave. You can
+also select a MIDI program directly by typing a program number on the number pad
+while holding the function key.
 
 ## Instant Guitar
 
@@ -47,7 +69,8 @@ You can switch to this alternate layout with the Tab key:
     C   D   E   F   G   A   B   C   D    E   F   G
 
 The function key for the guitar is Escape. Holding Escape while pressing the Up
-or Down key will change the program used by the guitar.
+or Down key will change the program used by the guitar. Holding Escape while
+pressing the Left or Right key will change the base note by one octave.
 
 ## Instant Drums
 
