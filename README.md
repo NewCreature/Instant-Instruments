@@ -8,18 +8,18 @@ keyboard. You can use either a guitar-, piano-, or drum-style interface.
 
 ### Windows
 
-Windows XP or newer
-Sound device
+* Windows XP or newer
+* Sound device
 
 ### MacOS
 
-MacOS 10.6 or newer
+* MacOS 10.6 or newer
 
 ### Linux
 
-Sound device
-FluidSynth (fluidsynth)
-Fluid General MIDI SoundFont (fluid-soundfont-gm)
+* Sound device
+* FluidSynth (fluidsynth)
+* Fluid General MIDI SoundFont (fluid-soundfont-gm)
 
 ## Getting Started
 
