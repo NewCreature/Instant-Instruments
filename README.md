@@ -4,9 +4,6 @@ Instant Instruments allows you to interface with your PC's built-in software
 synthesizer using something you already have connected to your PC, your
 keyboard. You can use either a guitar-, piano-, or drum-style interface.
 
-After opening Instant Instruments, you can immediately start playing sounds and
-music using any of the three available input methods.
-
 ## System Requirements
 
 ### Windows
@@ -24,7 +21,12 @@ Sound device
 FluidSynth (fluidsynth)
 Fluid General MIDI SoundFont (fluid-soundfont-gm)
 
-## Instant Piano
+## Getting Started
+
+UAfter opening Instant Instruments, you can immediately start playing sounds and
+music using any of the three available input methods.
+
+### Instant Piano
 
 The piano layout is as follows:
 
@@ -48,7 +50,7 @@ pressing the Left or Right key will change the base note by one octave. You can
 also select a MIDI program directly by typing a program number on the number pad
 while holding the function key.
 
-## Instant Guitar
+### Instant Guitar
 
 Hold your keyboard in your hands with the top edge resting in your left palm.
 Now you can play your instant guitar. Here is the default note layout:
@@ -72,7 +74,7 @@ The function key for the guitar is Escape. Holding Escape while pressing the Up
 or Down key will change the program used by the guitar. Holding Escape while
 pressing the Left or Right key will change the base note by one octave.
 
-## Instant Drums
+### Instant Drums
 
 The drums are mapped as follows:
 
