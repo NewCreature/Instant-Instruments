@@ -5,11 +5,13 @@
 
 #include "midi_event.h"
 #include "instrument.h"
+#include "midi.h"
 
 /* structure to hold all of our app-specific data */
 typedef struct
 {
 
+	ALLEGRO_FONT * font;
 	MIDIA5_OUTPUT_HANDLE * midi_out;
 	II_MIDI_EVENT_BATCH * midi_event_batch;
 	II_INSTRUMENT * guitar;
@@ -44,12 +46,38 @@ void app_logic(void * data)
 void app_render(void * data)
 {
 	APP_INSTANCE * app = (APP_INSTANCE *)data;
+	char * note_name[12] = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
+	char * guitar_mode_name[2] = {"1 - With Sharps and Flats", "2 - Without Sharps and Flats"};
+	int pos = 0;
 
 	switch(app->state)
 	{
 		default:
 		{
-			/* insert rendering code here, see app_logic() for more info */
+			al_clear_to_color(t3f_color_black);
+			al_draw_textf(app->font, t3f_color_white, 0, pos, 0, "Piano 1 (Use keys \'Z\' through \'/\' to play notes)");
+			pos += 36;
+			al_draw_textf(app->font, t3f_color_white, 0, pos, 0, "    Program: %d (%s)", app->piano[0]->program + 1, ii_midi_instrument_name[app->piano[0]->program]);
+			pos += 18;
+			al_draw_textf(app->font, t3f_color_white, 0, pos, 0, "    Base Note: %s (%d)", note_name[app->piano[0]->base_note % 12], app->piano[0]->base_note / 12 + 1);
+			pos += 36;
+			al_draw_textf(app->font, t3f_color_white, 0, pos, 0, "Piano 2 (Use keys '\'Q\' through \'P\' to play notes)");
+			pos += 36;
+			al_draw_textf(app->font, t3f_color_white, 0, pos, 0, "    Program: %d (%s)", app->piano[1]->program + 1, ii_midi_instrument_name[app->piano[1]->program]);
+			pos += 18;
+			al_draw_textf(app->font, t3f_color_white, 0, pos, 0, "    Base Note: %s (%d)", note_name[app->piano[1]->base_note % 12], app->piano[1]->base_note / 12 + 1);
+			pos += 36;
+			al_draw_textf(app->font, t3f_color_white, 0, pos, 0, "Guitar (Use keys \'F1\' through \'F12\' with Right Shift to play notes and chords)");
+			pos += 36;
+			al_draw_textf(app->font, t3f_color_white, 0, pos, 0, "    Program: %d (%s)", app->guitar->program + 1, ii_midi_instrument_name[app->guitar->program]);
+			pos += 18;
+			al_draw_textf(app->font, t3f_color_white, 0, pos, 0, "    Base Note: %s (%d)", note_name[app->guitar->base_note % 12], app->guitar->base_note / 12 + 1);
+			pos += 18;
+			al_draw_textf(app->font, t3f_color_white, 0, pos, 0, "    Chord Base Note: %s (%d)", note_name[app->guitar->chord_base_note % 12], app->guitar->chord_base_note / 12 + 1);
+			pos += 18;
+			al_draw_textf(app->font, t3f_color_white, 0, pos, 0, "    Mode: %s", guitar_mode_name[app->guitar->mode]);
+			pos += 36;
+			al_draw_textf(app->font, t3f_color_white, 0, pos, 0, "Drums (Use Insert, Delete, Home, End, Page Up, and Page Down from drum sounds)");
 			break;
 		}
 	}
@@ -191,6 +219,13 @@ bool app_initialize(APP_INSTANCE * app, int argc, char * argv[])
 		return false;
 	}
 	memset(app, 0, sizeof(APP_INSTANCE));
+
+	app->font = al_load_font("data/OpenSans-Regular.ttf", 16, 0);
+	if(!app->font)
+	{
+		printf("Error loading font!\n");
+		return false;
+	}
 
 	#ifdef ALLEGRO_UNIX
 		#ifndef ALLEGRO_MACOSX
