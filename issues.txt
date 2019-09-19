@@ -1,13 +1,6 @@
 Instant Instruments Issues
 --------------------------
 
-v0.1
-----
-
-[ ]Add temporary UI. Display text showing current settings and status of each
-   instrument.
-
-
 v0.2
 ----
 
