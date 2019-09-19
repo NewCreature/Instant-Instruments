@@ -12,7 +12,7 @@ static void ii_kill_drum_note(II_INSTRUMENT * ip, int note_pos)
 
 	for(i = 0; i < ip->key_note[note_pos].notes; i++)
 	{
-		ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_NOTE_OFF, ip->channel, ip->key_note[note_pos].note[i], 100, ip->key_note[note_pos].delay[i]);
+		ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_NOTE_OFF, ip->channel, ip->key_note[note_pos].note[i], 127, ip->key_note[note_pos].delay[i]);
 	}
 	ip->key_note[note_pos].notes = 0;
 }
@@ -20,7 +20,7 @@ static void ii_kill_drum_note(II_INSTRUMENT * ip, int note_pos)
 static void ii_play_drum_note(II_INSTRUMENT * ip, int note_pos)
 {
 	ii_kill_drum_note(ip, note_pos);
-	ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_NOTE_ON, ip->channel, ip->key_rel_note[note_pos], 100, 1);
+	ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_NOTE_ON, ip->channel, ip->key_rel_note[note_pos], 127, 1);
 	ip->key_note[note_pos].note[0] = ip->key_rel_note[note_pos];
 	ip->key_note[note_pos].delay[0] = 1;
 	ip->key_note[note_pos].notes = 1;

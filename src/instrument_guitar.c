@@ -17,7 +17,7 @@ static void ii_kill_guitar_note(II_INSTRUMENT * ip, int note_pos)
 
 	for(i = 0; i < ip->key_note[note_pos].notes; i++)
 	{
-		ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_NOTE_OFF, ip->channel, ip->key_note[note_pos].note[i], 100, ip->key_note[note_pos].delay[i]);
+		ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_NOTE_OFF, ip->channel, ip->key_note[note_pos].note[i], 127, ip->key_note[note_pos].delay[i]);
 	}
 	ip->key_note[note_pos].notes = 0;
 }
@@ -27,10 +27,10 @@ static void ii_play_guitar_note(II_INSTRUMENT * ip, int note_pos, int delay)
 	int note = ip->base_note + ii_note_chart[ip->mode][ip->key_rel_note[note_pos]];
 
 	ii_kill_guitar_note(ip, note_pos);
-	ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_NOTE_ON, ip->channel, note, 100, 1);
+	ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_NOTE_ON, ip->channel, note, 127, 1);
 	if(delay)
 	{
-		ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_NOTE_OFF, ip->channel, note, 100, delay);
+		ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_NOTE_OFF, ip->channel, note, 127, delay);
 	}
 	ip->key_note[note_pos].note[0] = note;
 	ip->key_note[note_pos].delay[0] = 1;
@@ -42,14 +42,14 @@ static void ii_play_guitar_chord(II_INSTRUMENT * ip, int note_pos, int speed, in
 	int note = ip->chord_base_note + ii_note_chart[ip->mode][ip->key_rel_note[note_pos]];
 
 	ii_kill_guitar_note(ip, note_pos);
-	ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_NOTE_ON, ip->channel, note, 100, 1);
-	ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_NOTE_ON, ip->channel, note + 4, 100, 1 + speed);
-	ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_NOTE_ON, ip->channel, note + 7, 100, 1 + speed * 2);
+	ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_NOTE_ON, ip->channel, note, 127, 1);
+	ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_NOTE_ON, ip->channel, note + 4, 127, 1 + speed);
+	ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_NOTE_ON, ip->channel, note + 7, 127, 1 + speed * 2);
 	if(delay)
 	{
-		ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_NOTE_OFF, ip->channel, note, 100, 1 + delay);
-		ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_NOTE_OFF, ip->channel, note + 4, 100, 1 + speed + delay);
-		ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_NOTE_OFF, ip->channel, note + 7, 100, 1 + speed * 2 + delay);
+		ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_NOTE_OFF, ip->channel, note, 127, 1 + delay);
+		ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_NOTE_OFF, ip->channel, note + 4, 127, 1 + speed + delay);
+		ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_NOTE_OFF, ip->channel, note + 7, 127, 1 + speed * 2 + delay);
 	}
 	ip->key_note[note_pos].note[0] = note;
 	ip->key_note[note_pos].delay[0] = 1;
@@ -65,12 +65,12 @@ static void ii_play_guitar_power_chord(II_INSTRUMENT * ip, int note_pos, int spe
 	int note = ip->chord_base_note + ii_note_chart[ip->mode][ip->key_rel_note[note_pos]];
 
 	ii_kill_guitar_note(ip, note_pos);
-	ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_NOTE_ON, ip->channel, note, 100, 1);
-	ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_NOTE_ON, ip->channel, note + 7, 100, 1 + speed);
+	ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_NOTE_ON, ip->channel, note, 127, 1);
+	ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_NOTE_ON, ip->channel, note + 7, 127, 1 + speed);
 	if(delay)
 	{
-		ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_NOTE_OFF, ip->channel, note, 100, 1 + delay);
-		ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_NOTE_OFF, ip->channel, note + 7, 100, 1 + speed + delay);
+		ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_NOTE_OFF, ip->channel, note, 127, 1 + delay);
+		ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_NOTE_OFF, ip->channel, note + 7, 127, 1 + speed + delay);
 	}
 	ip->key_note[note_pos].note[0] = note;
 	ip->key_note[note_pos].delay[0] = 1;
