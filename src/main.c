@@ -191,6 +191,7 @@ static int get_midi_device(void)
 					if(try < 5)
 					{
 						app->kill_fluidsynth = true;
+						break;
 					}
 					else
 					{
