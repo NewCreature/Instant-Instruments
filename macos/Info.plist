@@ -12,6 +12,8 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>1.0</string>
+	<key>NSHighResolutionCapable</key>
+    <false/>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
@@ -31,5 +33,7 @@
 	</array>
 	<key>CFBundleIconFile</key>
 	<string>T3F_APP_ICON</string>
+	<key>NSRequiresAquaSystemAppearance</key>
+	<string>False</string>
 </dict>
 </plist>

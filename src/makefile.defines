@@ -29,8 +29,8 @@ app_clean:
 # Mac OS X stuff #
 ##################
 #MACOSX_CFLAGS =
-MACOSX_PLATFORM_OBJECTS = MIDIA5/macos/coremidi.o
-MACOSX_PLATFORM_LIBS = -framework AVFoundation -framework AudioUnit
+MACOS_PLATFORM_OBJECTS = MIDIA5/macos/coremidi.o
+MACOS_PLATFORM_LIBS = -framework AVFoundation -framework AudioUnit
 #MACOSX_DEPEND_LIBS =
 #MACOSX_PLATFORM_TARGET =
 
