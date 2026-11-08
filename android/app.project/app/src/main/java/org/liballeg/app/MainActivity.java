@@ -1,9 +1,15 @@
 package org.liballeg.app;
 import org.liballeg.android.AllegroActivity;
+import android.os.Build;
 import android.content.Intent;
 import android.net.Uri;
 import android.content.Context;
 import android.util.Log;
+import android.view.View;
+import java.net.URL;
+import java.util.Scanner;
+import java.io.*;
+import java.net.MalformedURLException;
 
 public class MainActivity extends AllegroActivity
 {
@@ -89,4 +95,75 @@ public class MainActivity extends AllegroActivity
 		Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
 		startActivity(intent);
 	}
+
+    public byte[] downloadURL(String url)
+    {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+        try
+        {
+            URL urlObj = new URL(url);
+            byte[] chunk = new byte[4096];
+            int bytesRead;
+            InputStream stream = urlObj.openStream();
+
+            while((bytesRead = stream.read(chunk)) > 0)
+            {
+                outputStream.write(chunk, 0, bytesRead);
+            }
+
+        }
+        catch(MalformedURLException e)
+        {
+            e.printStackTrace();
+            return null;
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+            return null;
+        }
+        return outputStream.toByteArray();
+    }
+
+    public String runURL(String url) 
+    {
+        try
+        {
+            Log.d("runURL", "start");
+            URL urlObj = new URL(url);
+            Scanner sc = new Scanner(urlObj.openStream());
+            StringBuffer sb = new StringBuffer();
+            while(sc.hasNext())
+            {
+                sb.append(sc.next());
+            }
+            Log.d("runURL ", sb.toString());
+            return sb.toString();
+        }
+        catch(MalformedURLException e)
+        {
+        }
+        catch(IOException e)
+        {
+        }
+        return null;
+    }
+
+    public void ResetBackgroundColor()
+    {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+        {
+            runOnUiThread(
+                new Runnable()
+                {
+                    @Override public void run()
+                    {
+                        View view = getWindow().getDecorView();
+                        view.setBackgroundColor(getResources().getColor(R.color.app_default_color));
+                    }
+                }
+            );
+        }
+    }
 }

@@ -1,4 +1,7 @@
 #include "t3f.h"
+#ifdef ALLEGRO_WINDOWS
+	#include <windows.h>
+#endif
 
 /* The code below is from a supposedly working implementation. We should derive
    our implementation from it and see if we can actually find our
@@ -30,6 +33,22 @@
 	#define _jni_callv(env, method, args...) ({ \
 	   (*env)->method(env, args); \
 	   _jni_checkException(env); \
+	})
+
+	#define _jni_callObjectMethodV(env, obj, name, sig, args...) ({ \
+	   jclass class_id = _jni_call(env, jclass, GetObjectClass, obj); \
+	   \
+	   jmethodID method_id = _jni_call(env, jmethodID, GetMethodID, class_id, name, sig); \
+		 \
+		 jbyteArray ret = NULL; \
+	   if(method_id == NULL) { \
+	   } else { \
+		  ret = _jni_call(env, jbyteArray, CallObjectMethod, obj, method_id, ##args); \
+	   } \
+	   \
+	   _jni_callv(env, DeleteLocalRef, class_id); \
+		 \
+		 ret; \
 	})
 
 	#define _jni_callVoidMethodV(env, obj, name, sig, args...) ({ \
@@ -172,13 +191,49 @@ JNI_FUNC(void, MainActivity, nativeOnEditComplete, (JNIEnv *env, jobject obj, js
 			_al_android_get_jnienv(),
 			_al_android_activity_object(),
 			"openURL",
-			"(Ljava/lang/String;)V",
+			"(Ljava/lang/String;)L",
 			urlS
 		);
 		(*env)->DeleteLocalRef(env, urlS);
 	}
 
-#else
+	int t3f_run_url(const char * url, const char ** post_data, const char * out_path, char ** out_data)
+	{
+		JNIEnv * env = _al_android_get_jnienv();
+		jstring urlS = (*env)->NewStringUTF(env, url);
+		jbyteArray retB;
+		int retB_size;
+		const jbyte * ret;
+		int real_ret = 0;
+
+		retB = _jni_callObjectMethodV(
+			_al_android_get_jnienv(),
+			_al_android_activity_object(),
+			"downloadURL",
+			"(Ljava/lang/String;)[B",
+			urlS
+		);
+		if(retB)
+		{
+			retB_size = (*env)->GetArrayLength(env, retB);
+			ret = (*env)->GetByteArrayElements(env, retB, NULL);
+			*out_data = malloc(retB_size);
+			if(*out_data)
+			{
+				memcpy(*out_data, ret, retB_size);
+			}
+			(*env)->ReleaseStringUTFChars(env, retB, ret);
+			return 1;
+		}
+		return 0;
+	}
+
+	void _t3f_reset_android_bg_color(void)
+	{
+		_jni_callVoidMethodV(_al_android_get_jnienv(), _al_android_activity_object(), "ResetBackgroundColor", "()V");
+	}
+
+	#else
 
 	void t3f_android_support_helper(void)
 	{
@@ -192,21 +247,31 @@ JNI_FUNC(void, MainActivity, nativeOnEditComplete, (JNIEnv *env, jobject obj, js
 	{
 	}
 
+	void _t3f_reset_android_bg_color(void)
+	{
+	}
+
 	void t3f_open_url(const char *url)
 	{
 		char command[256] = {0};
 
 		#ifdef ALLEGRO_WINDOWS
-			snprintf(command, 256, "start %s", url);
+			ShellExecute(NULL, "open", url, NULL, NULL, SW_SHOWNORMAL);
 		#else
 			#ifdef ALLEGRO_MACOSX
 				snprintf(command, 256, "open %s", url);
 			#else
 				snprintf(command, 256, "xdg-open %s", url);
 			#endif
+			al_stop_timer(t3f_timer);
+			(void) system(command);
+			al_start_timer(t3f_timer);
 		#endif
-		al_stop_timer(t3f_timer);
-		(void) system(command);
-		al_start_timer(t3f_timer);
 	}
+
+	int t3f_run_url(const char * url, const char ** post_data, const char * out_path, char ** out_data)
+	{
+		return 0;
+	}
+
 #endif

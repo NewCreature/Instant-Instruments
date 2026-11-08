@@ -53,7 +53,7 @@ void ii_piano_logic(II_INSTRUMENT * ip)
 	{
 		if(ip->controller->state[i].pressed)
 		{
-			if(t3f_key[ALLEGRO_KEY_LCTRL])
+			if(t3f_key_held(ALLEGRO_KEY_LCTRL))
 			{
 				ii_play_piano_chord(ip, i);
 			}

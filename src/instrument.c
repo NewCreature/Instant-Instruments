@@ -142,10 +142,10 @@ void ii_instrument_logic(II_INSTRUMENT * ip)
 	int program;
 	int shift_amount;
 
-	if(t3f_key[ALLEGRO_KEY_TAB])
+	if(t3f_key_pressed(ALLEGRO_KEY_TAB))
 	{
 		ip->mode = 1 - ip->mode;
-		t3f_key[ALLEGRO_KEY_TAB] = 0;
+		t3f_use_key_press(ALLEGRO_KEY_TAB);
 	}
 
 	t3f_read_controller(ip->controller);
@@ -167,57 +167,57 @@ void ii_instrument_logic(II_INSTRUMENT * ip)
 	}
 	if(ip->controller->state[ip->controller->bindings - 1].held)
 	{
-		if(t3f_key[ALLEGRO_KEY_PAD_0])
+		if(t3f_key_pressed(ALLEGRO_KEY_PAD_0))
 		{
 			append_command_buffer('0');
-			t3f_key[ALLEGRO_KEY_PAD_0] = 0;
+			t3f_use_key_press(ALLEGRO_KEY_PAD_0);
 		}
-		if(t3f_key[ALLEGRO_KEY_PAD_1])
+		if(t3f_key_pressed(ALLEGRO_KEY_PAD_1))
 		{
 			append_command_buffer('1');
-			t3f_key[ALLEGRO_KEY_PAD_1] = 0;
+			t3f_use_key_press(ALLEGRO_KEY_PAD_1);
 		}
-		if(t3f_key[ALLEGRO_KEY_PAD_2])
+		if(t3f_key_pressed(ALLEGRO_KEY_PAD_2))
 		{
 			append_command_buffer('2');
-			t3f_key[ALLEGRO_KEY_PAD_2] = 0;
+			t3f_use_key_press(ALLEGRO_KEY_PAD_2);
 		}
-		if(t3f_key[ALLEGRO_KEY_PAD_3])
+		if(t3f_key_pressed(ALLEGRO_KEY_PAD_3))
 		{
 			append_command_buffer('3');
-			t3f_key[ALLEGRO_KEY_PAD_3] = 0;
+			t3f_use_key_press(ALLEGRO_KEY_PAD_3);
 		}
-		if(t3f_key[ALLEGRO_KEY_PAD_4])
+		if(t3f_key_pressed(ALLEGRO_KEY_PAD_4))
 		{
 			append_command_buffer('4');
-			t3f_key[ALLEGRO_KEY_PAD_4] = 0;
+			t3f_use_key_press(ALLEGRO_KEY_PAD_4);
 		}
-		if(t3f_key[ALLEGRO_KEY_PAD_5])
+		if(t3f_key_pressed(ALLEGRO_KEY_PAD_5))
 		{
 			append_command_buffer('5');
-			t3f_key[ALLEGRO_KEY_PAD_5] = 0;
+			t3f_use_key_press(ALLEGRO_KEY_PAD_5);
 		}
-		if(t3f_key[ALLEGRO_KEY_PAD_6])
+		if(t3f_key_pressed(ALLEGRO_KEY_PAD_6))
 		{
 			append_command_buffer('6');
-			t3f_key[ALLEGRO_KEY_PAD_6] = 0;
+			t3f_use_key_press(ALLEGRO_KEY_PAD_6);
 		}
-		if(t3f_key[ALLEGRO_KEY_PAD_7])
+		if(t3f_key_pressed(ALLEGRO_KEY_PAD_7))
 		{
 			append_command_buffer('7');
-			t3f_key[ALLEGRO_KEY_PAD_7] = 0;
+			t3f_use_key_press(ALLEGRO_KEY_PAD_7);
 		}
-		if(t3f_key[ALLEGRO_KEY_PAD_8])
+		if(t3f_key_pressed(ALLEGRO_KEY_PAD_8))
 		{
 			append_command_buffer('8');
-			t3f_key[ALLEGRO_KEY_PAD_8] = 0;
+			t3f_use_key_press(ALLEGRO_KEY_PAD_8);
 		}
-		if(t3f_key[ALLEGRO_KEY_PAD_9])
+		if(t3f_key_pressed(ALLEGRO_KEY_PAD_9))
 		{
 			append_command_buffer('9');
-			t3f_key[ALLEGRO_KEY_PAD_9] = 0;
+			t3f_use_key_press(ALLEGRO_KEY_PAD_9);
 		}
-		if(t3f_key[ALLEGRO_KEY_DOWN])
+		if(t3f_key_pressed(ALLEGRO_KEY_DOWN))
 		{
 			ip->program--;
 			if(ip->program < 0)
@@ -225,9 +225,9 @@ void ii_instrument_logic(II_INSTRUMENT * ip)
 				ip->program = 127;
 			}
 			ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_PROGRAM_CHANGE, ip->channel, ip->program, 0, 1);
-			t3f_key[ALLEGRO_KEY_DOWN] = 0;
+			t3f_use_key_press(ALLEGRO_KEY_DOWN);
 		}
-		if(t3f_key[ALLEGRO_KEY_UP])
+		if(t3f_key_pressed(ALLEGRO_KEY_UP))
 		{
 			ip->program++;
 			if(ip->program > 127)
@@ -235,9 +235,9 @@ void ii_instrument_logic(II_INSTRUMENT * ip)
 				ip->program = 0;
 			}
 			ii_add_midi_event(ip->midi_event_batch, RTK_MIDI_EVENT_TYPE_PROGRAM_CHANGE, ip->channel, ip->program, 0, 1);
-			t3f_key[ALLEGRO_KEY_UP] = 0;
+			t3f_use_key_press(ALLEGRO_KEY_UP);
 		}
-		if(t3f_key[ALLEGRO_KEY_LSHIFT])
+		if(t3f_key_held(ALLEGRO_KEY_LSHIFT))
 		{
 			shift_amount = 1;
 		}
@@ -245,23 +245,23 @@ void ii_instrument_logic(II_INSTRUMENT * ip)
 		{
 			shift_amount = 12;
 		}
-		if(t3f_key[ALLEGRO_KEY_LEFT])
+		if(t3f_key_pressed(ALLEGRO_KEY_LEFT))
 		{
 			ip->base_note -= shift_amount;
 			if(ip->base_note < 0)
 			{
 				ip->base_note = 108;
 			}
-			t3f_key[ALLEGRO_KEY_LEFT] = 0;
+			t3f_use_key_press(ALLEGRO_KEY_LEFT);
 		}
-		if(t3f_key[ALLEGRO_KEY_RIGHT])
+		if(t3f_key_pressed(ALLEGRO_KEY_RIGHT))
 		{
 			ip->base_note += shift_amount;
 			if(ip->base_note > 108)
 			{
 				ip->base_note = 0;
 			}
-			t3f_key[ALLEGRO_KEY_RIGHT] = 0;
+			t3f_use_key_press(ALLEGRO_KEY_RIGHT);
 		}
 	}
 	else
