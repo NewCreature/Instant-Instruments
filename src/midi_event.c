@@ -1,10 +1,10 @@
-#include "MIDIA5/midia5.h"
+#include "synthesizers/synthesizer.h"
 #include "rtk/midi.h"
 
 #include "midi.h"
 #include "midi_event.h"
 
-II_MIDI_EVENT_BATCH * ii_create_midi_event_batch(MIDIA5_OUTPUT_HANDLE * hp, int max)
+II_MIDI_EVENT_BATCH * ii_create_midi_event_batch(II_SYNTHESIZER * synthesizer, int max)
 {
 	II_MIDI_EVENT_BATCH * bp;
 
@@ -14,7 +14,7 @@ II_MIDI_EVENT_BATCH * ii_create_midi_event_batch(MIDIA5_OUTPUT_HANDLE * hp, int 
 		goto fail;
 	}
 	memset(bp, 0, sizeof(II_MIDI_EVENT_BATCH));
-	bp->midi_out = hp;
+	bp->synthesizer = synthesizer;
 	bp->event = malloc(sizeof(II_MIDI_EVENT) * max);
 	if(!bp->event)
 	{
@@ -57,23 +57,23 @@ void ii_add_midi_event(II_MIDI_EVENT_BATCH * bp, int type, int channel, int d1, 
 	}
 }
 
-static void trigger_event(MIDIA5_OUTPUT_HANDLE * hp, II_MIDI_EVENT * ep)
+static void trigger_event(II_SYNTHESIZER * synthesizer, II_MIDI_EVENT * ep)
 {
 	switch(ep->type)
 	{
 		case RTK_MIDI_EVENT_TYPE_NOTE_ON:
 		{
-			ii_send_note_on(hp, ep->channel, ep->data[0], ep->data[1]);
+			ii_send_note_on(synthesizer, ep->channel, ep->data[0], ep->data[1]);
 			break;
 		}
 		case RTK_MIDI_EVENT_TYPE_NOTE_OFF:
 		{
-			ii_send_note_off(hp, ep->channel, ep->data[0], ep->data[1]);
+			ii_send_note_off(synthesizer, ep->channel, ep->data[0], ep->data[1]);
 			break;
 		}
 		case RTK_MIDI_EVENT_TYPE_PROGRAM_CHANGE:
 		{
-			ii_send_program_change(hp, ep->channel, ep->data[0]);
+			ii_send_program_change(synthesizer, ep->channel, ep->data[0]);
 			break;
 		}
 	}
@@ -90,7 +90,7 @@ void ii_process_midi_event_batch(II_MIDI_EVENT_BATCH * bp)
 			bp->event[i].delay--;
 			if(bp->event[i].delay <= 0)
 			{
-				trigger_event(bp->midi_out, &bp->event[i]);
+				trigger_event(bp->synthesizer, &bp->event[i]);
 			}
 		}
 	}

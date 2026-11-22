@@ -1,18 +1,19 @@
 #include "t3f/t3f.h"
 #include "t3f/controller.h"
-#include "rtk/midi.h"
-#include "MIDIA5/midia5.h"
+#include "synthesizers/synthesizer.h"
+#include "synthesizers/fluid_synth.h"
 
 #include "midi_event.h"
 #include "instrument.h"
 #include "midi.h"
+#include "MIDIA5/midia5.h"
 
 /* structure to hold all of our app-specific data */
 typedef struct
 {
 
 	ALLEGRO_FONT * font;
-	MIDIA5_OUTPUT_HANDLE * midi_out;
+	II_SYNTHESIZER * synthesizer;
 	II_MIDI_EVENT_BATCH * midi_event_batch;
 	II_INSTRUMENT * guitar;
 	II_INSTRUMENT * piano[2];
@@ -130,84 +131,6 @@ static int get_midi_device(void)
 	return 0;
 }
 
-#ifdef ALLEGRO_UNIX
-	#ifndef ALLEGRO_MACOSX
-		static char * get_helper_script_path(char * buf, int buf_size)
-		{
-			ALLEGRO_PATH * path;
-
-			path = al_get_standard_path(ALLEGRO_EXENAME_PATH);
-			if(path)
-			{
-				al_set_path_filename(path, "instant-instruments-helper.sh");
-				strcpy(buf, al_path_cstr(path, '/'));
-				al_destroy_path(path);
-				return buf;
-			}
-			return NULL;
-		}
-
-		static int start_fluidsynth(void)
-		{
-			char command[1024];
-
-			if(get_helper_script_path(command, 1024))
-			{
-				strcat(command, " start");
-				return system(command);
-			}
-			return 0;
-		}
-
-		static int stop_fluidsynth(void)
-		{
-			char command[1024];
-
-			if(get_helper_script_path(command, 1024))
-			{
-				strcat(command, " stop");
-				return system(command);
-			}
-			return 0;
-		}
-
-		static void enable_fluidsynth(APP_INSTANCE * app)
-		{
-			int try = 0;
-			int i;
-
-			if(get_fluidsynth_device() < 0)
-			{
-				for(i = 0; i < 5; i++)
-				{
-					start_fluidsynth();
-					al_rest(0.5);
-					while(get_fluidsynth_device() < 0 && try < 5)
-					{
-						printf("FluidSynth device not found. Retrying...\n");
-						al_rest(0.5);
-						try++;
-					}
-					if(try < 5)
-					{
-						app->kill_fluidsynth = true;
-						break;
-					}
-					else
-					{
-						stop_fluidsynth();
-						try = 0;
-					}
-				}
-			}
-			else
-			{
-				app->kill_fluidsynth = false;
-			}
-		}
-	#endif
-#endif
-
 /* initialize our app, load graphics, etc. */
 bool app_initialize(APP_INSTANCE * app, int argc, char * argv[])
 {
@@ -228,24 +151,19 @@ bool app_initialize(APP_INSTANCE * app, int argc, char * argv[])
 		return false;
 	}
 
-	#ifdef ALLEGRO_UNIX
-		#ifndef ALLEGRO_MACOSX
-			enable_fluidsynth(app);
-		#endif
-	#endif
 	midi_device = get_midi_device();
 	if(midi_device < 0)
 	{
 		printf("Could not detect MIDI device!\n");
 		return false;
 	}
-	app->midi_out = midia5_create_output_handle(midi_device);
-	if(!app->midi_out)
+	app->synthesizer = ii_create_fluid_synth_synthesizer();
+	if(!app->synthesizer)
 	{
-		printf("Could not get MIDI output device!\n");
+		printf("Create synthesizer!\n");
 		return false;
 	}
-	app->midi_event_batch = ii_create_midi_event_batch(app->midi_out, 256);
+	app->midi_event_batch = ii_create_midi_event_batch(app->synthesizer, 256);
 	if(!app->midi_event_batch)
 	{
 		printf("Could not create MIDI event batch!\n");
@@ -298,18 +216,10 @@ int main(int argc, char * argv[])
 	{
 		printf("Error: could not initialize T3F!\n");
 	}
-	if(app.midi_out)
+	if(app.synthesizer)
 	{
-		midia5_destroy_output_handle(app.midi_out);
+		ii_destroy_synthesizer(app.synthesizer);
 	}
-	#ifdef ALLEGRO_UNIX
-		#ifndef ALLEGRO_MACOSX
-			if(app.kill_fluidsynth)
-			{
-				stop_fluidsynth();
-			}
-		#endif
-	#endif
 	if(app.guitar)
 	{
 		ii_destroy_instrument(app.guitar);
